@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Cirurgias - Admin - AME Control{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="bi bi-heart-pulse"></i> Cirurgias</h2>
+        <p class="text-muted">Gerenciamento de procedimentos cirúrgicos</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'cirurgia_upload_csv' %}" class="btn btn-secondary me-2">
+            <i class="bi bi-upload"></i> Importar CSV
+        </a>
+        <a href="{% url 'cirurgia_criar' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nova Cirurgia
+        </a>
+    </div>
+</div>
+
+{# Filtros #}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="busca" class="form-label">Buscar</label>
+                <input type="text" class="form-control" id="busca" name="busca" 
+                       placeholder="Código SIGTAP ou Descrição" 
+                       value="{{ request.GET.busca }}">
+            </div>
+            <div class="col-md-3">
+                <label for="tipo" class="form-label">Tipo de Cirurgia</label>
+                <select class="form-select" id="tipo" name="tipo">
+                    <option value="">Todos</option>
+                    {% for value, label in tipo_choices %}
+                        <option value="{{ value }}" {% if request.GET.tipo == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="especialidade" class="form-label">Especialidade</label>
+                <input type="text" class="form-control" id="especialidade" name="especialidade" 
+                       placeholder="Ex: Cirurgia Geral" 
+                       value="{{ request.GET.especialidade }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Listagem #}
+<div class="card">
+    <div class="card-body">
+        {% if cirurgias %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Código SIGTAP</th>
+                        <th>Descrição</th>
+                        <th style="width: 120px;">Valor (R$)</th>
+                        <th style="width: 140px;">Tipo</th>
+                        <th style="width: 180px;">Especialidade</th>
+                        <th style="width: 80px;">Status</th>
+                        <th style="width: 100px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cirurgia in cirurgias %}
+                    <tr>
+                        <td><code>{{ cirurgia.codigo_sigtap }}</code></td>
+                        <td>
+                            <strong>{{ cirurgia.descricao|truncatewords:10 }}</strong>
+                            {% if cirurgia.descricao|length > 50 %}
+                                <br><small class="text-muted">{{ cirurgia.descricao|truncatewords:15 }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-end"><strong>R$ {{ cirurgia.valor|floatformat:2 }}</strong></td>
+                        <td>
+                            {% if cirurgia.tipo_cirurgia == 'ELETIVA' %}
+                                <span class="badge bg-primary">{{ cirurgia.get_tipo_cirurgia_display }}</span>
+                            {% elif cirurgia.tipo_cirurgia == 'URGENCIA' %}
+                                <span class="badge bg-warning text-dark">{{ cirurgia.get_tipo_cirurgia_display }}</span>
+                            {% elif cirurgia.tipo_cirurgia == 'EMERGENCIA' %}
+                                <span class="badge bg-danger">{{ cirurgia.get_tipo_cirurgia_display }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ cirurgia.get_tipo_cirurgia_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ cirurgia.especialidade }}</small></td>
+                        <td>
+                            {% if cirurgia.ativa %}
+                                <span class="badge bg-success">Ativa</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativa</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'cirurgia_editar' cirurgia.pk %}" 
+                               class="btn btn-sm btn-primary" 
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-3">
+            <p class="text-muted mb-0">
+                <i class="bi bi-info-circle"></i> 
+                Total: <strong>{{ cirurgias.count }}</strong> cirurgia(s) encontrada(s)
+            </p>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> 
+            {% if request.GET %}
+                Nenhuma cirurgia encontrada com os filtros aplicados.
+            {% else %}
+                Nenhuma cirurgia cadastrada ainda. Clique em "Nova Cirurgia" ou "Importar CSV" para começar.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'admin_menu' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar ao Menu Admin
+    </a>
+</div>
+{% endblock %}
