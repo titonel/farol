@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from . import views_admin
 
 urlpatterns = [
     # Autenticação
@@ -31,18 +30,21 @@ urlpatterns = [
     # ========== ÁREA ADMINISTRATIVA (TIER 5) ==========
     
     # Menu Admin
-    path('admin/', views_admin.admin_menu_view, name='admin_menu'),
+    path('admin/', views.admin_menu_view, name='admin_menu'),
     
     # Cirurgias
-    path('admin/cirurgias/', views_admin.cirurgia_lista_view, name='cirurgia_lista'),
-    path('admin/cirurgias/nova/', views_admin.cirurgia_criar_view, name='cirurgia_criar'),
-    path('admin/cirurgias/<int:pk>/editar/', views_admin.cirurgia_editar_view, name='cirurgia_editar'),
-    path('admin/cirurgias/upload-csv/', views_admin.cirurgia_upload_csv_view, name='cirurgia_upload_csv'),
-    path('admin/cirurgias/buscar-sigtap/', views_admin.buscar_sigtap_view, name='buscar_sigtap'),
+    path('admin/cirurgias/', views.cirurgia_lista_view, name='cirurgia_lista'),
+    path('admin/cirurgias/nova/', views.cirurgia_criar_view, name='cirurgia_criar'),
+    path('admin/cirurgias/<int:pk>/editar/', views.cirurgia_editar_view, name='cirurgia_editar'),
+    path('admin/cirurgias/upload/', views.cirurgia_upload_view, name='cirurgia_upload'),
     
     # Exames
-    path('admin/exames/', views_admin.exame_lista_view, name='exame_lista'),
+    path('admin/exames/', views.exame_lista_view, name='exame_lista'),
+    path('admin/exames/novo/', views.exame_criar_view, name='exame_criar'),
+    path('admin/exames/<int:pk>/editar/', views.exame_editar_view, name='exame_editar'),
     
     # Serviços Médicos
-    path('admin/servicos/', views_admin.servico_lista_view, name='servico_lista'),
+    path('admin/servicos/', views.servico_lista_view, name='servico_lista'),
+    path('admin/servicos/novo/', views.servico_criar_view, name='servico_criar'),
+    path('admin/servicos/<int:pk>/editar/', views.servico_editar_view, name='servico_editar'),
 ]
