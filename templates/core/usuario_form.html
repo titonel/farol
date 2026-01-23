@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ acao }} Usuário - AME Control{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-person-plus"></i> {{ acao }} Usuário</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Atenção:</strong> O username será gerado automaticamente a partir do e-mail (parte antes do @).
+                        O usuário deverá trocar a senha no primeiro acesso.
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'usuario_lista' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Níveis de Acesso</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2"><strong>Tier 1:</strong> Operacional</li>
+                    <li class="mb-2"><strong>Tier 2:</strong> Analista/Líder</li>
+                    <li class="mb-2"><strong>Tier 3:</strong> Supervisor</li>
+                    <li class="mb-2"><strong>Tier 4:</strong> Coordenador</li>
+                    <li class="mb-2"><strong>Tier 5:</strong> Gerente/Admin</li>
+                </ul>
+                <hr>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-info-circle"></i> Apenas usuários Tier 3 ou superior podem cadastrar novos usuários.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
