@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Médicos - AME Control{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-heart-pulse"></i> Médicos</h2>
+        <p class="text-muted">Gerenciamento de médicos cadastrados</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'medico_criar' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Médico
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if medicos %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CRM</th>
+                        <th>Especialidade</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medico in medicos %}
+                    <tr>
+                        <td><strong>{{ medico.nome_completo }}</strong></td>
+                        <td>{{ medico.crm }}</td>
+                        <td>{{ medico.especialidade|default:"-" }}</td>
+                        <td>{{ medico.telefone|default:"-" }}</td>
+                        <td>
+                            {% if medico.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'medico_editar' medico.pk %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nenhum médico cadastrado ainda.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'cadastro_menu' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+{% endblock %}
