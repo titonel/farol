@@ -199,4 +199,4 @@ Para mais detalhes, consulte:
 
 ## Licença
 
-Todos os direitos reservados.
+(c)2026, AME Caraguatatuba. Todos os direitos reservados.
