@@ -361,17 +361,23 @@ class ServicoMedico(models.Model):
     codigo_sigtap = models.CharField(
         'Código SIGTAP',
         max_length=20,
-        unique=True,
+        blank=True,
+        null=True,
         help_text='Ex: 03.01.01.007-5'
     )
     
-    descricao = models.CharField('Descrição', max_length=500)
+    descricao = models.CharField(
+        'Descrição',
+        max_length=500,
+        blank=True,
+        null=True
+    )
     
     valor = models.DecimalField(
-        'Valor (R$)',
+        'Valor Unitário (R$)',
         max_digits=10,
         decimal_places=2,
-        help_text='Valor do serviço em reais'
+        help_text='Valor unitário do serviço em reais'
     )
     
     especialidade = models.CharField(
@@ -406,4 +412,8 @@ class ServicoMedico(models.Model):
         ordering = ['especialidade', 'descricao']
     
     def __str__(self):
-        return f"{self.codigo_sigtap} - {self.descricao}"
+        if self.descricao:
+            if self.codigo_sigtap:
+                return f"{self.codigo_sigtap} - {self.descricao}"
+            return self.descricao
+        return f"Serviço #{self.pk}"
