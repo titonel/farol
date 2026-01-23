@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ acao }} Cirurgia - AME Control{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-scissors"></i> {{ acao }} Cirurgia</h2>
+        <p class="text-muted">Preencha os dados do procedimento cirúrgico</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-medical"></i> Dados da Cirurgia</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="cirurgiaForm">
+                    {% csrf_token %}
+                    
+                    {# Seção: Identificação SIGTAP #}
+                    <div class="form-section mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-upc-scan"></i> Identificação SIGTAP
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.codigo_sigtap.id_for_label }}" class="form-label">
+                                        <i class="bi bi-hash"></i> {{ form.codigo_sigtap.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.codigo_sigtap }}
+                                        <button class="btn btn-outline-secondary" type="button" id="buscarSigtapBtn" disabled>
+                                            <i class="bi bi-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                    {% if form.codigo_sigtap.errors %}
+                                        <div class="text-danger mt-1">
+                                            <small><i class="bi bi-exclamation-circle"></i> {{ form.codigo_sigtap.errors }}</small>
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Ex: 04.07.01.012-0</small>
+                                    <div class="alert alert-warning mt-2" role="alert">
+                                        <small><i class="bi bi-exclamation-triangle"></i> API SIGTAP não disponível. Preencha manualmente.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                <i class="bi bi-card-text"></i> {{ form.descricao.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.descricao }}
+                            {% if form.descricao.errors %}
+                                <div class="text-danger mt-1">
+                                    <small><i class="bi bi-exclamation-circle"></i> {{ form.descricao.errors }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Seção: Dados do Procedimento #}
+                    <div class="form-section mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-info-circle"></i> Dados do Procedimento
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                        <i class="bi bi-currency-dollar"></i> {{ form.valor.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.valor }}
+                                    {% if form.valor.errors %}
+                                        <div class="text-danger mt-1">
+                                            <small><i class="bi bi-exclamation-circle"></i> {{ form.valor.errors }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.tipo_cirurgia.id_for_label }}" class="form-label">
+                                        <i class="bi bi-tag"></i> {{ form.tipo_cirurgia.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.tipo_cirurgia }}
+                                    {% if form.tipo_cirurgia.errors %}
+                                        <div class="text-danger mt-1">
+                                            <small><i class="bi bi-exclamation-circle"></i> {{ form.tipo_cirurgia.errors }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.especialidade.id_for_label }}" class="form-label">
+                                        <i class="bi bi-star"></i> {{ form.especialidade.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.especialidade }}
+                                    {% if form.especialidade.errors %}
+                                        <div class="text-danger mt-1">
+                                            <small><i class="bi bi-exclamation-circle"></i> {{ form.especialidade.errors }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {# Seção: Status #}
+                    <div class="form-section mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-toggle-on"></i> Status
+                        </h6>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.ativa }}
+                                <label class="form-check-label" for="{{ form.ativa.id_for_label }}">
+                                    <strong>{{ form.ativa.label }}</strong>
+                                    <br>
+                                    <small class="text-muted">Cirurgias inativas não aparecerão nas listagens principais</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    {# Botões de Ação #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="{% url 'cirurgia_lista' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <div>
+                            <button type="reset" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-x-circle"></i> Limpar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Salvar Cirurgia
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {# Sidebar com informações #}
+    <div class="col-lg-3">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informações</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <i class="bi bi-asterisk text-danger"></i> <strong>Campos Obrigatórios</strong>
+                    </small>
+                    <ul class="list-unstyled small">
+                        <li><i class="bi bi-check2 text-success"></i> Código SIGTAP</li>
+                        <li><i class="bi bi-check2 text-success"></i> Descrição</li>
+                        <li><i class="bi bi-check2 text-success"></i> Valor</li>
+                        <li><i class="bi bi-check2 text-success"></i> Tipo</li>
+                        <li><i class="bi bi-check2 text-success"></i> Especialidade</li>
+                    </ul>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <i class="bi bi-lightbulb"></i> <strong>Dicas</strong>
+                    </small>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><i class="bi bi-dot"></i> O código SIGTAP deve ser único</li>
+                        <li class="mb-2"><i class="bi bi-dot"></i> Formato: XX.XX.XX.XXX-X</li>
+                        <li class="mb-2"><i class="bi bi-dot"></i> Prefira upload CSV para múltiplos registros</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-section {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.form-section h6 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.card-header h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.form-label i {
+    color: var(--secondary-color);
+    margin-right: 0.25rem;
+}
+</style>
+{% endblock %}

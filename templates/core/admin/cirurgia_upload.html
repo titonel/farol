@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload CSV - Cirurgias - AME Control{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-file-earmark-arrow-up"></i> Upload CSV - Cirurgias</h2>
+        <p class="text-muted">Importação em massa de procedimentos cirúrgicos</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Enviar Arquivo CSV</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Formato do Arquivo</h6>
+                        <p class="mb-2">O arquivo CSV deve conter as seguintes colunas (com cabeçalho):</p>
+                        <ul class="mb-0">
+                            <li><code>Codigo SIGTAP</code> - Código do procedimento</li>
+                            <li><code>Descricao</code> - Descrição do procedimento</li>
+                            <li><code>Valor</code> - Valor em reais (usar ponto como separador decimal)</li>
+                            <li><code>Tipo Cirurgia</code> - ELETIVA, URGENCIA, EMERGENCIA ou AMBULATORIAL</li>
+                            <li><code>Especialidade</code> - Nome da especialidade</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.arquivo_csv.id_for_label }}" class="form-label">
+                            <i class="bi bi-file-earmark-text"></i> {{ form.arquivo_csv.label }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {{ form.arquivo_csv }}
+                        {% if form.arquivo_csv.errors %}
+                            <div class="text-danger mt-1">
+                                <small><i class="bi bi-exclamation-circle"></i> {{ form.arquivo_csv.errors }}</small>
+                            </div>
+                        {% endif %}
+                        {% if form.arquivo_csv.help_text %}
+                            <small class="form-text text-muted d-block mt-1">{{ form.arquivo_csv.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Importante:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>O arquivo deve estar codificado em <strong>UTF-8</strong></li>
+                            <li>Cirurgias com código SIGTAP já existentes serão <strong>atualizadas</strong></li>
+                            <li>Linhas com erros serão ignoradas e reportadas ao final</li>
+                        </ul>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="{% url 'cirurgia_lista' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Fazer Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {# Sidebar com exemplo #}
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-file-earmark-code"></i> Exemplo de CSV</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Exemplo do conteúdo do arquivo CSV:</p>
+                <pre class="bg-light p-3 rounded" style="font-size: 0.75rem;">Codigo SIGTAP,Descricao,Valor,Tipo Cirurgia,Especialidade
+04.07.01.012-0,Apendicectomia,1500.00,ELETIVA,Cirurgia Geral
+04.08.04.015-6,Cesariana,2000.00,URGENCIA,Obstetricia
+04.03.02.008-1,Colecistectomia,1800.00,ELETIVA,Cirurgia Geral</pre>
+                
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <i class="bi bi-download"></i> Você pode criar o arquivo em qualquer planilha (Excel, Google Sheets) e salvar como CSV UTF-8.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-shield-check"></i> Segurança</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <i class="bi bi-lock"></i> O upload é validado e os dados são processados de forma segura.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
