@@ -22,11 +22,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Código SIGTAP</th>
-                        <th>Descrição</th>
                         <th>Especialidade</th>
-                        <th>Duração</th>
-                        <th>Valor (R$)</th>
+                        <th>Duração Estimada</th>
+                        <th>Valor Unitário (R$)</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -34,17 +32,21 @@
                 <tbody>
                     {% for servico in servicos %}
                     <tr>
-                        <td><code>{{ servico.codigo_sigtap }}</code></td>
-                        <td><strong>{{ servico.descricao|truncatewords:15 }}</strong></td>
-                        <td>{{ servico.especialidade|default:"-" }}</td>
                         <td>
-                            {% if servico.duracao_estimada %}
-                                {{ servico.duracao_estimada }} min
+                            {% if servico.especialidade %}
+                                <strong>{{ servico.especialidade }}</strong>
                             {% else %}
-                                -
+                                <span class="text-muted">Não especificada</span>
                             {% endif %}
                         </td>
-                        <td>R$ {{ servico.valor|floatformat:2 }}</td>
+                        <td>
+                            {% if servico.duracao_estimada %}
+                                <i class="bi bi-clock"></i> {{ servico.duracao_estimada }} min
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>R$ {{ servico.valor|floatformat:2 }}</strong></td>
                         <td>
                             {% if servico.ativo %}
                                 <span class="badge bg-success">Ativo</span>
