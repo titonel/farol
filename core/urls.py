@@ -27,24 +27,24 @@ urlpatterns = [
     path('medicos/novo/', views.medico_criar_view, name='medico_criar'),
     path('medicos/<int:pk>/editar/', views.medico_editar_view, name='medico_editar'),
     
-    # ========== ÁREA ADMINISTRATIVA (TIER 5) ==========
+    # ========== ÁREA DE CONFIGURAÇÕES (TIER 5) ==========
     
-    # Menu Admin
-    path('admin/', views.admin_menu_view, name='admin_menu'),
+    # Menu Configurações
+    path('config/', views.admin_menu_view, name='admin_menu'),
     
     # Cirurgias
-    path('admin/cirurgias/', views.cirurgia_lista_view, name='cirurgia_lista'),
-    path('admin/cirurgias/nova/', views.cirurgia_criar_view, name='cirurgia_criar'),
-    path('admin/cirurgias/<int:pk>/editar/', views.cirurgia_editar_view, name='cirurgia_editar'),
-    path('admin/cirurgias/upload/', views.cirurgia_upload_view, name='cirurgia_upload'),
+    path('config/cirurgias/', views.cirurgia_lista_view, name='cirurgia_lista'),
+    path('config/cirurgias/nova/', views.cirurgia_criar_view, name='cirurgia_criar'),
+    path('config/cirurgias/<int:pk>/editar/', views.cirurgia_editar_view, name='cirurgia_editar'),
+    path('config/cirurgias/upload/', views.cirurgia_upload_view, name='cirurgia_upload'),
     
     # Exames
-    path('admin/exames/', views.exame_lista_view, name='exame_lista'),
-    path('admin/exames/novo/', views.exame_criar_view, name='exame_criar'),
-    path('admin/exames/<int:pk>/editar/', views.exame_editar_view, name='exame_editar'),
+    path('config/exames/', views.exame_lista_view, name='exame_lista'),
+    path('config/exames/novo/', views.exame_criar_view, name='exame_criar'),
+    path('config/exames/<int:pk>/editar/', views.exame_editar_view, name='exame_editar'),
     
     # Serviços Médicos
-    path('admin/servicos/', views.servico_lista_view, name='servico_lista'),
-    path('admin/servicos/novo/', views.servico_criar_view, name='servico_criar'),
-    path('admin/servicos/<int:pk>/editar/', views.servico_editar_view, name='servico_editar'),
+    path('config/servicos/', views.servico_lista_view, name='servico_lista'),
+    path('config/servicos/novo/', views.servico_criar_view, name='servico_criar'),
+    path('config/servicos/<int:pk>/editar/', views.servico_editar_view, name='servico_editar'),
 ]
