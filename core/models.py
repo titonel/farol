@@ -241,10 +241,8 @@ class Cirurgia(models.Model):
     """Modelo para cadastro de cirurgias."""
     
     TIPO_CHOICES = [
-        ('ELETIVA', 'Eletiva'),
-        ('URGENCIA', 'Urgência'),
-        ('EMERGENCIA', 'Emergência'),
-        ('AMBULATORIAL', 'Ambulatorial'),
+        ('CMA', 'Cirurgias Maiores (CMA)'),
+        ('cma', 'Cirurgias menores (cma)'),
     ]
     
     codigo_sigtap = models.CharField(
@@ -267,7 +265,7 @@ class Cirurgia(models.Model):
         'Tipo de Cirurgia',
         max_length=20,
         choices=TIPO_CHOICES,
-        default='ELETIVA'
+        default='CMA'
     )
     
     especialidade = models.CharField(
