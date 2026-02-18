@@ -1,5 +1,5 @@
 """
-Django settings for ame_control project.
+Django settings for farol project.
 """
 
 from pathlib import Path
@@ -36,7 +36,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ame_control.urls'
+ROOT_URLCONF = 'farol.urls'
 
 TEMPLATES = [
     {
@@ -54,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ame_control.wsgi.application'
+WSGI_APPLICATION = 'farol.wsgi.application'
 
 # Database
 DATABASES = {

@@ -1,4 +1,4 @@
-# AME Control
+# Farol
 
 Sistema de controle corporativo com autenticação e controle de acesso baseado em funções (RBAC).
 
@@ -137,7 +137,7 @@ python manage.py createsuperuser
 
 ```
 ame-control/
-├── ame_control/          # Configurações do projeto
+├── farol/                # Configurações do projeto
 ├── core/                  # Aplicação principal
 │   ├── models.py         # Modelos (Usuario, Empresa, Medico)
 │   ├── views.py          # Lógica das views

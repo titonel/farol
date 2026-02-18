@@ -1,5 +1,5 @@
 """
-URL configuration for ame_control project.
+URL configuration for farol project.
 """
 from django.contrib import admin
 from django.urls import path, include

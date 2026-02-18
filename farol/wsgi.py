@@ -1,11 +1,11 @@
 """
-WSGI config for ame_control project.
+WSGI config for farol project.
 """
 
 import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ame_control.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'farol.settings')
 
 application = get_wsgi_application()
