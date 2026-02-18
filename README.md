@@ -15,8 +15,8 @@ Sistema de controle corporativo com autenticação e controle de acesso baseado 
 ### Opção 1: Setup Automático (Recomendado)
 
 ```bash
-git clone https://github.com/titonel/ame-control.git
-cd ame-control
+git clone https://github.com/titonel/farol.git
+cd farol
 python -m venv .venv
 
 # No Windows:
@@ -33,8 +33,8 @@ python setup.py
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/titonel/ame-control.git
-cd ame-control
+git clone https://github.com/titonel/farol.git
+cd farol
 ```
 
 2. **Crie e ative o ambiente virtual:**
@@ -136,7 +136,7 @@ python manage.py createsuperuser
 ## Estrutura do Projeto
 
 ```
-ame-control/
+farol/
 ├── farol/                # Configurações do projeto
 ├── core/                  # Aplicação principal
 │   ├── models.py         # Modelos (Usuario, Empresa, Medico)
