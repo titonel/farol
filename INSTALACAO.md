@@ -1,4 +1,4 @@
-# Guia de Instalação do AME Control
+# Guia de Instalação do Farol
 
 ## Pré-requisitos
 
@@ -137,12 +137,12 @@ python manage.py createsuperuser
 pip install psycopg2-binary
 ```
 
-2. Edite o arquivo `.env` ou `ame_control/settings.py` para configurar o PostgreSQL:
+2. Edite o arquivo `.env` ou `farol/settings.py` para configurar o PostgreSQL:
 ```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ame_control_db',
+        'NAME': 'farol_db',
         'USER': 'seu_usuario',
         'PASSWORD': 'sua_senha',
         'HOST': 'localhost',

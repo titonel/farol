@@ -1,4 +1,4 @@
-# Histórico de Alterações - AME Control
+# Histórico de Alterações - Farol
 
 ## [2026-01-23] - Busca Automática de CEP
 
@@ -74,7 +74,7 @@ Running migrations:
 ### Alterado
 - **Campo DRT**: Renomeado para "DRT/Matrícula" e agora aceita apenas números
 - **Username**: Agora é exibido no formulário de cadastro (campo readonly) e é gerado automaticamente a partir do e-mail
-- **Senha Padrão**: Todos os novos usuários são criados com a senha `ame-control`
+- **Senha Padrão**: Todos os novos usuários são criados com a senha `farol`
 
 ### Como Atualizar
 
@@ -106,7 +106,7 @@ python manage.py runserver
   - Username gerado: `saulo.bastos`
 
 #### 3. Senha Padrão
-- **Senha**: `ame-control`
+- **Senha**: `farol`
 - **Primeiro Acesso**: O usuário será obrigado a trocar a senha no primeiro login
 - **Segurança**: A senha é armazenada de forma criptografada no banco de dados
 
@@ -123,7 +123,7 @@ O formulário de cadastro agora inclui:
 ### Card Informativo
 
 Um novo card foi adicionado à lateral direita do formulário exibindo:
-- **Senha Padrão**: `ame-control`
+- **Senha Padrão**: `farol`
 - Informação sobre troca obrigatória no primeiro acesso
 
 ---

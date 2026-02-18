@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script de setup automático para o AME Control
+Script de setup automático para o Farol
 Execute este script após clonar o repositório
 """
 
@@ -28,7 +28,7 @@ def run_command(command, description):
 
 def main():
     """Função principal do setup."""
-    print_step("BEM-VINDO AO SETUP DO AME CONTROL")
+    print_step("BEM-VINDO AO SETUP DO FAROL")
     
     # Verifica se está no diretório correto
     if not os.path.exists('manage.py'):
@@ -56,7 +56,7 @@ def main():
     
     # Finalização
     print_step("SETUP CONCLUÍDO COM SUCESSO!")
-    print("O AME Control foi instalado e configurado.\n")
+    print("O Farol foi instalado e configurado.\n")
     print("Para iniciar o servidor, execute:")
     print("  python manage.py runserver\n")
     print("Em seguida, acesse: http://127.0.0.1:8000\n")

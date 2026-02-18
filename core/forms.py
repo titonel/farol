@@ -100,7 +100,7 @@ class UsuarioForm(forms.ModelForm):
     def save(self, commit=True):
         usuario = super().save(commit=False)
         usuario.username = self.cleaned_data['email'].split('@')[0]
-        usuario.set_password('ame-control')
+        usuario.set_password('farol')
         usuario.primeiro_acesso = True
         if commit:
             usuario.save()

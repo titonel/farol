@@ -1,11 +1,11 @@
 """
-ASGI config for ame_control project.
+ASGI config for farol project.
 """
 
 import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ame_control.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'farol.settings')
 
 application = get_asgi_application()
