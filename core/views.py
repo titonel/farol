@@ -2,17 +2,21 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q
 from functools import wraps
 import csv
 import io
-from decimal import Decimal
+import re
+from datetime import date
+from decimal import Decimal, InvalidOperation
 
 from .forms import (
     LoginForm, TrocaSenhaForm, UsuarioForm, EmpresaForm, MedicoForm,
-    CirurgiaForm, CirurgiaUploadForm, ExameForm, ServicoMedicoForm
+    CirurgiaForm, CirurgiaUploadForm, ExameForm, ServicoMedicoForm,
+    ProducaoUploadForm,
 )
-from .models import Usuario, Empresa, Medico, Cirurgia, Exame, ServicoMedico
+from .models import Usuario, Empresa, Medico, Cirurgia, Exame, ServicoMedico, ProducaoMensal
 
 
 # DECORATOR PARA TIER 5
@@ -519,3 +523,296 @@ def servico_editar_view(request, pk):
         form = ServicoMedicoForm(instance=servico)
     
     return render(request, 'core/admin/servico_form.html', {'form': form, 'acao': 'Editar'})
+
+
+# ===== MÓDULO DE PRODUÇÃO =====
+
+_MESES_PT = {
+    'janeiro': 1, 'fevereiro': 2, 'marco': 3, 'março': 3,
+    'abril': 4, 'maio': 5, 'junho': 6,
+    'julho': 7, 'agosto': 8, 'setembro': 9,
+    'outubro': 10, 'novembro': 11, 'dezembro': 12,
+    'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6,
+    'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12,
+}
+
+_NOMES_MESES = {
+    1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+    5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+    9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro',
+}
+
+
+def _parse_mes_ano(cell_value):
+    """Interpreta o conteúdo da célula F3 e retorna o primeiro dia do mês."""
+    if cell_value is None:
+        raise ValueError("Célula F3 está vazia.")
+
+    if hasattr(cell_value, 'year') and hasattr(cell_value, 'month'):
+        return date(cell_value.year, cell_value.month, 1)
+
+    value = str(cell_value).strip()
+
+    m = re.match(r'^(\d{1,2})[/\-](\d{4})$', value)
+    if m:
+        return date(int(m.group(2)), int(m.group(1)), 1)
+
+    m = re.match(r'^(\d{4})[/\-](\d{1,2})$', value)
+    if m:
+        return date(int(m.group(1)), int(m.group(2)), 1)
+
+    m = re.match(r'^([A-Za-zÀ-ÿ]+)[/ ](\d{4})$', value)
+    if m:
+        mes_str = m.group(1).lower()
+        mes_str = mes_str.translate(str.maketrans('áéíóúâêîôûãõç', 'aeiouaeiouaoc'))
+        mes = _MESES_PT.get(mes_str)
+        if mes:
+            return date(int(m.group(2)), mes, 1)
+
+    raise ValueError(
+        f"Não foi possível interpretar a data '{cell_value}' da célula F3. "
+        "Use formatos como: MM/AAAA, Janeiro/AAAA ou Janeiro AAAA."
+    )
+
+
+def _to_int(v):
+    if v is None or (isinstance(v, str) and v.strip() == ''):
+        return None
+    try:
+        return int(float(str(v).replace(',', '.')))
+    except (ValueError, TypeError):
+        return None
+
+
+def _to_decimal_str(v):
+    if v is None or (isinstance(v, str) and v.strip() == ''):
+        return None
+    try:
+        s = str(v).replace(',', '.').replace('%', '').strip()
+        return str(Decimal(s))
+    except (InvalidOperation, ValueError, TypeError):
+        return None
+
+
+def _parse_xlsx(arquivo):
+    """Lê arquivo .xlsx e retorna (mes_ano, lista_de_registros)."""
+    import openpyxl
+    wb = openpyxl.load_workbook(arquivo, data_only=True)
+    ws = wb.active
+
+    cell_f3 = ws.cell(row=3, column=6).value
+    mes_ano = _parse_mes_ano(cell_f3)
+
+    registros = []
+    for row_idx in range(8, ws.max_row + 1):
+        vals = [ws.cell(row=row_idx, column=c).value for c in range(1, 14)]
+        if all(v is None or str(v).strip() == '' for v in vals):
+            continue
+        especialidade = vals[0]
+        if especialidade is None or str(especialidade).strip() == '':
+            continue
+        registros.append({
+            'especialidade': str(especialidade).strip(),
+            'vagas_ofertadas': _to_int(vals[1]),
+            'total_agendamentos': _to_int(vals[2]),
+            'perc_agendamentos': _to_decimal_str(vals[3]),
+            'agendamentos_cota': _to_int(vals[4]),
+            'perc_cota': _to_decimal_str(vals[5]),
+            'vagas_bolsao': _to_int(vals[6]),
+            'perc_bolsao': _to_decimal_str(vals[7]),
+            'vagas_nao_distribuidas': _to_int(vals[8]),
+            'perc_nao_distribuidas': _to_decimal_str(vals[9]),
+            'vagas_extras': _to_int(vals[10]),
+            'perc_extras': _to_decimal_str(vals[11]),
+            'perc_desperdicadas': _to_decimal_str(vals[12]),
+        })
+    return mes_ano, registros
+
+
+def _parse_xls(arquivo):
+    """Lê arquivo .xls e retorna (mes_ano, lista_de_registros)."""
+    import xlrd
+    content = arquivo.read()
+    wb = xlrd.open_workbook(file_contents=content)
+    ws = wb.sheet_by_index(0)
+
+    cell_f3_raw = ws.cell(2, 5)
+    if cell_f3_raw.ctype == xlrd.XL_CELL_DATE:
+        dt = xlrd.xldate_as_tuple(cell_f3_raw.value, wb.datemode)
+        mes_ano = date(dt[0], dt[1], 1)
+    else:
+        mes_ano = _parse_mes_ano(cell_f3_raw.value)
+
+    registros = []
+    for row_idx in range(7, ws.nrows):
+        vals = [ws.cell(row_idx, c).value for c in range(13)]
+        if all(v == '' or v is None for v in vals):
+            continue
+        especialidade = vals[0]
+        if not especialidade or str(especialidade).strip() == '':
+            continue
+        registros.append({
+            'especialidade': str(especialidade).strip(),
+            'vagas_ofertadas': _to_int(vals[1]),
+            'total_agendamentos': _to_int(vals[2]),
+            'perc_agendamentos': _to_decimal_str(vals[3]),
+            'agendamentos_cota': _to_int(vals[4]),
+            'perc_cota': _to_decimal_str(vals[5]),
+            'vagas_bolsao': _to_int(vals[6]),
+            'perc_bolsao': _to_decimal_str(vals[7]),
+            'vagas_nao_distribuidas': _to_int(vals[8]),
+            'perc_nao_distribuidas': _to_decimal_str(vals[9]),
+            'vagas_extras': _to_int(vals[10]),
+            'perc_extras': _to_decimal_str(vals[11]),
+            'perc_desperdicadas': _to_decimal_str(vals[12]),
+        })
+    return mes_ano, registros
+
+
+@login_required
+def producao_menu_view(request):
+    """Landing page do módulo de produção."""
+    if request.user.primeiro_acesso:
+        return redirect('trocar_senha')
+    return render(request, 'core/producao_menu.html')
+
+
+@login_required
+def producao_upload_view(request):
+    """Upload da planilha de produção mensal."""
+    if request.user.primeiro_acesso:
+        return redirect('trocar_senha')
+
+    if request.method == 'POST':
+        form = ProducaoUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            arquivo = request.FILES['arquivo']
+            nome = arquivo.name.lower()
+            try:
+                if nome.endswith('.xlsx'):
+                    mes_ano, registros = _parse_xlsx(arquivo)
+                else:
+                    mes_ano, registros = _parse_xls(arquivo)
+
+                if not registros:
+                    messages.error(request, 'Nenhum dado encontrado no arquivo. Verifique a estrutura da planilha.')
+                    return render(request, 'core/producao_upload.html', {'form': form})
+
+                request.session['producao_upload'] = {
+                    'mes_ano': mes_ano.isoformat(),
+                    'mes_ano_display': f"{_NOMES_MESES[mes_ano.month]}/{mes_ano.year}",
+                    'registros': registros,
+                }
+                return redirect('producao_confirmar')
+
+            except ValueError as e:
+                messages.error(request, f'Erro ao ler o arquivo: {e}')
+            except Exception as e:
+                messages.error(request, f'Erro inesperado ao processar o arquivo: {e}')
+    else:
+        form = ProducaoUploadForm()
+
+    return render(request, 'core/producao_upload.html', {'form': form})
+
+
+@login_required
+def producao_confirmar_view(request):
+    """Exibe os dados carregados para confirmação antes de gravar."""
+    if request.user.primeiro_acesso:
+        return redirect('trocar_senha')
+
+    dados = request.session.get('producao_upload')
+    if not dados:
+        messages.warning(request, 'Sessão expirada. Faça o upload novamente.')
+        return redirect('producao_upload')
+
+    mes_ano = date.fromisoformat(dados['mes_ano'])
+    mes_ano_display = dados.get('mes_ano_display', mes_ano.strftime('%m/%Y'))
+    registros = dados['registros']
+    existe = ProducaoMensal.objects.filter(mes_ano=mes_ano).exists()
+
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                ProducaoMensal.objects.filter(mes_ano=mes_ano).delete()
+                for reg in registros:
+                    def _d(v):
+                        return Decimal(v) if v is not None else None
+                    ProducaoMensal.objects.create(
+                        mes_ano=mes_ano,
+                        especialidade=reg['especialidade'],
+                        vagas_ofertadas=reg['vagas_ofertadas'],
+                        total_agendamentos=reg['total_agendamentos'],
+                        perc_agendamentos=_d(reg['perc_agendamentos']),
+                        agendamentos_cota=reg['agendamentos_cota'],
+                        perc_cota=_d(reg['perc_cota']),
+                        vagas_bolsao=reg['vagas_bolsao'],
+                        perc_bolsao=_d(reg['perc_bolsao']),
+                        vagas_nao_distribuidas=reg['vagas_nao_distribuidas'],
+                        perc_nao_distribuidas=_d(reg['perc_nao_distribuidas']),
+                        vagas_extras=reg['vagas_extras'],
+                        perc_extras=_d(reg['perc_extras']),
+                        perc_desperdicadas=_d(reg['perc_desperdicadas']),
+                        importado_por=request.user,
+                    )
+            del request.session['producao_upload']
+            messages.success(
+                request,
+                f'{len(registros)} registro(s) gravado(s) com sucesso para {mes_ano_display}!'
+            )
+            return redirect('producao_dashboard')
+        except Exception as e:
+            messages.error(request, f'Erro ao gravar os dados: {e}')
+
+    context = {
+        'mes_ano': mes_ano,
+        'mes_ano_display': mes_ano_display,
+        'registros': registros,
+        'existe': existe,
+        'total': len(registros),
+    }
+    return render(request, 'core/producao_confirmar.html', context)
+
+
+@login_required
+def producao_dashboard_view(request):
+    """Dashboard de acompanhamento da produção mensal."""
+    if request.user.primeiro_acesso:
+        return redirect('trocar_senha')
+
+    meses_disponiveis = (
+        ProducaoMensal.objects
+        .values_list('mes_ano', flat=True)
+        .distinct()
+        .order_by('-mes_ano')
+    )
+
+    mes_selecionado = None
+    mes_selecionado_str = request.GET.get('mes')
+    if mes_selecionado_str:
+        try:
+            mes_selecionado = date.fromisoformat(mes_selecionado_str)
+        except ValueError:
+            pass
+
+    if mes_selecionado is None and meses_disponiveis:
+        mes_selecionado = meses_disponiveis[0]
+
+    producoes = None
+    mes_selecionado_display = None
+    if mes_selecionado:
+        producoes = ProducaoMensal.objects.filter(mes_ano=mes_selecionado).order_by('especialidade')
+        mes_selecionado_display = f"{_NOMES_MESES[mes_selecionado.month]}/{mes_selecionado.year}"
+
+    meses_com_display = [
+        {'valor': m.isoformat(), 'display': f"{_NOMES_MESES[m.month]}/{m.year}"}
+        for m in meses_disponiveis
+    ]
+
+    context = {
+        'meses_com_display': meses_com_display,
+        'mes_selecionado': mes_selecionado,
+        'mes_selecionado_display': mes_selecionado_display,
+        'producoes': producoes,
+    }
+    return render(request, 'core/producao_dashboard.html', context)

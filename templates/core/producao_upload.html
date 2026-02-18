@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Importar Planilha - Produção - Farol{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-file-earmark-arrow-up"></i> Importar Planilha de Produção</h2>
+        <p class="text-muted">Selecione o arquivo Excel com os dados mensais de produção</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="{{ form.arquivo.id_for_label }}" class="form-label fw-semibold">
+                            <i class="bi bi-file-earmark-excel"></i> {{ form.arquivo.label }}
+                        </label>
+                        {{ form.arquivo }}
+                        {% if form.arquivo.help_text %}
+                            <div class="form-text">{{ form.arquivo.help_text }}</div>
+                        {% endif %}
+                        {% if form.arquivo.errors %}
+                            <div class="text-danger mt-1">{{ form.arquivo.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'producao_menu' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Carregar e Verificar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Estrutura esperada do arquivo</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-table text-primary"></i>
+                        <strong>Célula F3:</strong> Mês e ano de referência<br>
+                        <small class="text-muted ms-4">Ex: Janeiro/2025 ou 01/2025</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-layout-text-sidebar text-primary"></i>
+                        <strong>Linha 7:</strong> Cabeçalhos das colunas
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-arrow-down text-primary"></i>
+                        <strong>Linha 8 em diante:</strong> Dados por especialidade
+                    </li>
+                    <li class="mt-3 pt-2 border-top">
+                        <strong>Colunas A–M:</strong>
+                        <table class="table table-sm mt-2 mb-0">
+                            <tbody>
+                                <tr><td class="fw-bold">A</td><td>Especialidade</td></tr>
+                                <tr><td class="fw-bold">B</td><td>Vagas Ofertadas</td></tr>
+                                <tr><td class="fw-bold">C</td><td>Total Agendamentos</td></tr>
+                                <tr><td class="fw-bold">D</td><td>% Agendamentos</td></tr>
+                                <tr><td class="fw-bold">E</td><td>Agend. da Cota</td></tr>
+                                <tr><td class="fw-bold">F</td><td>% da Cota</td></tr>
+                                <tr><td class="fw-bold">G</td><td>Vagas de Bolsão</td></tr>
+                                <tr><td class="fw-bold">H</td><td>% Bolsão</td></tr>
+                                <tr><td class="fw-bold">I</td><td>Vagas Não Distribuídas</td></tr>
+                                <tr><td class="fw-bold">J</td><td>% Não Distribuídas</td></tr>
+                                <tr><td class="fw-bold">K</td><td>Vagas Extras</td></tr>
+                                <tr><td class="fw-bold">L</td><td>% Extras</td></tr>
+                                <tr><td class="fw-bold">M</td><td>% Desperdiçadas</td></tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

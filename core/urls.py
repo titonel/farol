@@ -47,4 +47,10 @@ urlpatterns = [
     path('config/servicos/', views.servico_lista_view, name='servico_lista'),
     path('config/servicos/novo/', views.servico_criar_view, name='servico_criar'),
     path('config/servicos/<int:pk>/editar/', views.servico_editar_view, name='servico_editar'),
+
+    # ========== MÓDULO DE PRODUÇÃO ==========
+    path('producao/', views.producao_menu_view, name='producao_menu'),
+    path('producao/upload/', views.producao_upload_view, name='producao_upload'),
+    path('producao/confirmar/', views.producao_confirmar_view, name='producao_confirmar'),
+    path('producao/dashboard/', views.producao_dashboard_view, name='producao_dashboard'),
 ]

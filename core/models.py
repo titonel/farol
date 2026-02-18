@@ -417,3 +417,50 @@ class ServicoMedico(models.Model):
                 return f"{self.codigo_sigtap} - {self.descricao}"
             return self.descricao
         return f"Serviço #{self.pk}"
+
+
+# ===== MÓDULO DE PRODUÇÃO =====
+
+class ProducaoMensal(models.Model):
+    """Registro mensal de produção por especialidade, importado via planilha."""
+
+    mes_ano = models.DateField('Mês/Ano de Referência')
+    especialidade = models.CharField('Especialidade', max_length=255)
+
+    vagas_ofertadas = models.IntegerField('Vagas Ofertadas', null=True, blank=True)
+
+    total_agendamentos = models.IntegerField('Total de Agendamentos', null=True, blank=True)
+    perc_agendamentos = models.DecimalField('% Agendamentos', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    agendamentos_cota = models.IntegerField('Agendamentos da Cota', null=True, blank=True)
+    perc_cota = models.DecimalField('% da Cota', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    vagas_bolsao = models.IntegerField('Vagas de Bolsão', null=True, blank=True)
+    perc_bolsao = models.DecimalField('% de Bolsão', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    vagas_nao_distribuidas = models.IntegerField('Vagas Não Distribuídas', null=True, blank=True)
+    perc_nao_distribuidas = models.DecimalField('% Não Distribuídas', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    vagas_extras = models.IntegerField('Vagas Extras', null=True, blank=True)
+    perc_extras = models.DecimalField('% Extras', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    perc_desperdicadas = models.DecimalField('% Desperdiçadas', max_digits=7, decimal_places=2, null=True, blank=True)
+
+    importado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='producoes_importadas',
+        verbose_name='Importado por'
+    )
+    criado_em = models.DateTimeField('Importado em', auto_now_add=True)
+    atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Produção Mensal'
+        verbose_name_plural = 'Produções Mensais'
+        unique_together = [['mes_ano', 'especialidade']]
+        ordering = ['-mes_ano', 'especialidade']
+
+    def __str__(self):
+        return f"{self.especialidade} - {self.mes_ano.strftime('%m/%Y')}"

@@ -320,7 +320,7 @@ class ExameForm(forms.ModelForm):
 
 class ServicoMedicoForm(forms.ModelForm):
     """Formulário para cadastro de serviços médicos."""
-    
+
     class Meta:
         model = ServicoMedico
         fields = ['valor', 'especialidade', 'duracao_estimada', 'ativo']
@@ -340,3 +340,23 @@ class ServicoMedicoForm(forms.ModelForm):
             }),
             'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+class ProducaoUploadForm(forms.Form):
+    """Formulário para upload de planilha de produção mensal."""
+    arquivo = forms.FileField(
+        label='Planilha de Produção',
+        help_text='Arquivo Excel (.xlsx ou .xls) com os dados mensais de produção',
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.xlsx,.xls'
+        })
+    )
+
+    def clean_arquivo(self):
+        arquivo = self.cleaned_data.get('arquivo')
+        if arquivo:
+            nome = arquivo.name.lower()
+            if not (nome.endswith('.xlsx') or nome.endswith('.xls')):
+                raise ValidationError('O arquivo deve ser no formato .xlsx ou .xls.')
+        return arquivo
