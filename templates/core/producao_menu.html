@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Produção - Farol{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-bar-chart-line"></i> Produção</h2>
+        <p class="text-muted">Gestão e acompanhamento da produção mensal por especialidade</p>
+    </div>
+</div>
+
+<div class="cadastro-menu">
+    <a href="{% url 'producao_upload' %}" class="cadastro-item">
+        <div class="icon">
+            <i class="bi bi-file-earmark-arrow-up"></i>
+        </div>
+        <h4>Importar Planilha</h4>
+        <p class="text-muted mb-0">Fazer upload dos dados mensais de produção</p>
+    </a>
+
+    <a href="{% url 'producao_dashboard' %}" class="cadastro-item">
+        <div class="icon">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <h4>Dashboard</h4>
+        <p class="text-muted mb-0">Visualizar e acompanhar a produção</p>
+    </a>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar ao Início
+        </a>
+    </div>
+</div>
+{% endblock %}

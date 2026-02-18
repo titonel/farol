@@ -40,6 +40,11 @@
                                 <i class="bi bi-person-plus"></i> Cadastro
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/producao' in request.path %}active{% endif %}" href="{% url 'producao_menu' %}">
+                                <i class="bi bi-bar-chart-line"></i> Produção
+                            </a>
+                        </li>
                         {% if user.is_admin %}
                         <li class="nav-item">
                             <a class="nav-link {% if '/config/' in request.path %}active{% endif %}" href="{% url 'admin_menu' %}">
