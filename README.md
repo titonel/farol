@@ -83,6 +83,25 @@ python manage.py runserver
 - Sistema: http://127.0.0.1:8000
 - Admin: http://127.0.0.1:8000/admin
 
+## Primeiro Acesso
+
+### Superusuário (criado via `createsuperuser`)
+
+O superusuário é criado com as credenciais que você informou durante o setup. Use essas mesmas credenciais para o primeiro login.
+
+> Superusuários são criados com `primeiro_acesso = False` e **não** são obrigados a trocar a senha no primeiro login.
+
+### Usuários genéricos (criados pela interface web)
+
+Quando um usuário é cadastrado por outro usuário (Tier 3 ou superior) pela interface web, o sistema define automaticamente:
+
+| Campo    | Valor                                      |
+|----------|--------------------------------------------|
+| Username | Parte do e-mail antes do `@` (ex.: `joao.silva` para `joao.silva@empresa.com`) |
+| Senha    | `farol`                                    |
+
+> **Atenção:** Na primeira vez que o usuário fizer login com a senha `farol`, o sistema irá redirecioná-lo obrigatoriamente para a tela de troca de senha antes de permitir qualquer acesso.
+
 ## Resolução de Problemas
 
 ### Erro: "no such table: core_usuario"
