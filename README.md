@@ -33,12 +33,21 @@ O projeto atual unifica o sistema **Farol** original com o módulo de gestão de
 * **Segurança Integrada**:
   * Todas as rotas do módulo de Contratos & Prestadores (`/prestadores/...`) são protegidas pelo decorator de autenticação e política de primeiro acesso do Farol.
 
+### 4. Módulo Linhas de Cuidado (Hipertensão)
+* **Importação & Integração**: Importado do sistema Linha de Cuidado de Hipertensão e integrado ao ecossistema global do Farol.
+* **Gestão Clínica**: Prontuário eletrônico completo, controle pressórico, SOAP (Subjetivo, Objetivo, Avaliação e Plano), e avaliações multidisciplinares.
+* **Prescrições & Receituários**: Geração e exportação em PDF de receitas médicas, kits de exames e termos de contrarreferência via `xhtml2pdf`.
+* **Farmácia e REMUME Regionalizada**: Cadastro de medicamentos e controle da REMUME integrada (Litoral Norte e Paraibuna).
+* **Indicadores Clínicos**: Dashboard interativo com gráficos (Chart.js) de controle pressórico, faixa etária, sexo e distribuição geográfica.
+* **Autenticação Unificada**: Controle de acesso profissional (Médicos, Enfermeiros, Nutricionistas, Farmacêuticos) unificado com a base de usuários do Farol.
+
 ---
 
 ## 🎨 Identidade Visual e Experiência do Usuário (UI/UX)
 
 * **Tema Farol**: Interface limpa e moderna utilizando a fonte **Inter** do Google Fonts, com paleta corporativa premium baseada em *Slate* (Slate-900 `#0f172a`, Slate-800 `#1e293b`), destaques em azul cobalto, sombras suaves, cantos arredondados (`12px`) e animações suaves (`fade-in`) nas transições de página.
 * **Tema de Contratos**: Seção de contratos mantém a identidade visual quente ("Dia Ensolarado") baseada na paleta bronze/âmbar (`#FFBF00` e `#807040`) e fonte **Lato**, integrada à navegação global do sistema.
+* **Módulo Hipertensão**: Totalmente remodelado para coincidir com a identidade do Farol, adotando os tons dark slate, a tipografia Inter, os estilos de cartões com cantos arredondados, realces de navegação ativos em azul cobalto e uso nativo dos ícones Bootstrap (substituindo ícones legados).
 
 ---
 
@@ -60,6 +69,14 @@ farol-project/
 │   ├── producao_siresp.py     # Parser de consultas
 │   ├── producao_siresp_exames.py # Parser de cirurgias/exames
 │   └── urls.py                # Rotas do módulo de Contratos
+├── hipertensao/               # App de Linhas de Cuidado (Hipertensão)
+│   ├── models.py              # Modelos (Paciente, Afericao, Atendimento, Medicamento)
+│   ├── views.py               # Lógica clínica, dashboards e relatórios PDF
+│   ├── forms.py               # Formulários de pacientes e fichas médicas
+│   ├── decorators.py          # Controle de acesso por tipo profissional
+│   ├── urls.py                # Rotas do módulo de Hipertensão
+│   ├── templates/             # Fichas e prontuários da Linha de Cuidado
+│   └── management/commands/   # Comandos de setup (setup_db para REMUME)
 ├── static/                    # Arquivos estáticos globais (CSS redesenhado, imagens)
 ├── templates/                 # Templates HTML globais do Farol
 ├── media/                     # Diretório de arquivos de contratos e planilhas enviadas
@@ -102,7 +119,13 @@ python manage.py createsuperuser
 ```
 Preencha o Nome, E-mail, DRT/Matrícula e Senha solicitados.
 
-### 5. Iniciar o Servidor
+### 5. Configurar Dados Iniciais da REMUME (Hipertensão)
+```bash
+python manage.py setup_db
+```
+Este comando popula a farmácia do sistema com as dosagens e princípios ativos das REMUMEs de Caraguá, São Sebastião, Ilhabela, Ubatuba e Paraibuna.
+
+### 6. Iniciar o Servidor
 ```bash
 python manage.py runserver
 ```
