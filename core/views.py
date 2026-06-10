@@ -12,11 +12,11 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 
 from .forms import (
-    LoginForm, TrocaSenhaForm, UsuarioForm, EmpresaForm, MedicoForm,
+    LoginForm, TrocaSenhaForm, UsuarioForm,
     CirurgiaForm, CirurgiaUploadForm, ExameForm, ServicoMedicoForm,
     ProducaoUploadForm,
 )
-from .models import Usuario, Empresa, Medico, Cirurgia, Exame, ServicoMedico, ProducaoMensal
+from .models import Usuario, Cirurgia, Exame, ServicoMedico, ProducaoMensal
 
 
 # DECORATOR PARA TIER 5
@@ -96,25 +96,23 @@ def dashboard_view(request):
     if request.user.primeiro_acesso:
         return redirect('trocar_senha')
     
+    try:
+        from cadastro.models import Prestador, ContratoUpload, Medico as MedicoCadastro
+        total_prestadores = Prestador.objects.filter(ativo=True).count()
+        total_contratos = ContratoUpload.objects.count()
+        total_medicos_cadastro = MedicoCadastro.objects.filter(ativo=True).count()
+    except (ImportError, Exception):
+        total_prestadores = 0
+        total_contratos = 0
+        total_medicos_cadastro = 0
+    
     context = {
         'total_usuarios': Usuario.objects.count(),
-        'total_empresas': Empresa.objects.filter(ativa=True).count(),
-        'total_medicos': Medico.objects.filter(ativo=True).count(),
-        'total_cirurgias': Cirurgia.objects.filter(ativa=True).count(),
-        'total_exames': Exame.objects.filter(ativo=True).count(),
-        'total_servicos': ServicoMedico.objects.filter(ativo=True).count(),
+        'total_prestadores': total_prestadores,
+        'total_medicos': total_medicos_cadastro,
+        'total_contratos': total_contratos,
     }
     return render(request, 'core/dashboard.html', context)
-
-
-# CADASTROS
-
-@login_required
-def cadastro_menu_view(request):
-    """Menu de cadastros."""
-    if request.user.primeiro_acesso:
-        return redirect('trocar_senha')
-    return render(request, 'core/cadastro_menu.html')
 
 
 # USUARIOS
@@ -147,92 +145,6 @@ def usuario_criar_view(request):
         form = UsuarioForm()
     
     return render(request, 'core/usuario_form.html', {'form': form, 'acao': 'Cadastrar'})
-
-
-# EMPRESAS
-
-@login_required
-def empresa_lista_view(request):
-    """Lista todas as empresas."""
-    empresas = Empresa.objects.all().order_by('razao_social')
-    return render(request, 'core/empresa_lista.html', {'empresas': empresas})
-
-
-@login_required
-def empresa_criar_view(request):
-    """Cria nova empresa."""
-    if request.method == 'POST':
-        form = EmpresaForm(request.POST)
-        if form.is_valid():
-            empresa = form.save(commit=False)
-            empresa.cadastrado_por = request.user
-            empresa.save()
-            messages.success(request, 'Empresa cadastrada com sucesso!')
-            return redirect('empresa_lista')
-    else:
-        form = EmpresaForm()
-    
-    return render(request, 'core/empresa_form.html', {'form': form, 'acao': 'Cadastrar'})
-
-
-@login_required
-def empresa_editar_view(request, pk):
-    """Edita uma empresa existente."""
-    empresa = get_object_or_404(Empresa, pk=pk)
-    
-    if request.method == 'POST':
-        form = EmpresaForm(request.POST, instance=empresa)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Empresa atualizada com sucesso!')
-            return redirect('empresa_lista')
-    else:
-        form = EmpresaForm(instance=empresa)
-    
-    return render(request, 'core/empresa_form.html', {'form': form, 'acao': 'Editar'})
-
-
-# MEDICOS
-
-@login_required
-def medico_lista_view(request):
-    """Lista todos os médicos."""
-    medicos = Medico.objects.all().order_by('nome_completo')
-    return render(request, 'core/medico_lista.html', {'medicos': medicos})
-
-
-@login_required
-def medico_criar_view(request):
-    """Cria novo médico."""
-    if request.method == 'POST':
-        form = MedicoForm(request.POST)
-        if form.is_valid():
-            medico = form.save(commit=False)
-            medico.cadastrado_por = request.user
-            medico.save()
-            messages.success(request, 'Médico cadastrado com sucesso!')
-            return redirect('medico_lista')
-    else:
-        form = MedicoForm()
-    
-    return render(request, 'core/medico_form.html', {'form': form, 'acao': 'Cadastrar'})
-
-
-@login_required
-def medico_editar_view(request, pk):
-    """Edita um médico existente."""
-    medico = get_object_or_404(Medico, pk=pk)
-    
-    if request.method == 'POST':
-        form = MedicoForm(request.POST, instance=medico)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Médico atualizado com sucesso!')
-            return redirect('medico_lista')
-    else:
-        form = MedicoForm(instance=medico)
-    
-    return render(request, 'core/medico_form.html', {'form': form, 'acao': 'Editar'})
 
 
 # ===== ÁREA ADMINISTRATIVA (TIER 5) =====

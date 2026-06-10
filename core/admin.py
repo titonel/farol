@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Empresa, Medico
+from .models import Usuario
 
 
 @admin.register(Usuario)
@@ -23,21 +23,3 @@ class UsuarioAdmin(UserAdmin):
             'fields': ('username', 'email', 'nome_completo', 'cpf', 'tier', 'password1', 'password2'),
         }),
     )
-
-
-@admin.register(Empresa)
-class EmpresaAdmin(admin.ModelAdmin):
-    list_display = ['razao_social', 'nome_fantasia', 'cnpj', 'ativa', 'data_cadastro']
-    list_filter = ['ativa', 'data_cadastro']
-    search_fields = ['razao_social', 'nome_fantasia', 'cnpj']
-    readonly_fields = ['data_cadastro', 'data_atualizacao', 'cadastrado_por']
-    ordering = ['razao_social']
-
-
-@admin.register(Medico)
-class MedicoAdmin(admin.ModelAdmin):
-    list_display = ['nome_completo', 'crm', 'especialidade', 'ativo', 'data_cadastro']
-    list_filter = ['ativo', 'especialidade', 'data_cadastro']
-    search_fields = ['nome_completo', 'crm', 'cpf']
-    readonly_fields = ['data_cadastro', 'data_atualizacao', 'cadastrado_por']
-    ordering = ['nome_completo']

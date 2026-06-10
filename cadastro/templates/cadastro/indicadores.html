@@ -1,0 +1,66 @@
+{% extends "cadastro/base.html" %}
+{% block title %}Indicadores — Cadastro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">📈 Indicadores</h1>
+  <a href="{% url 'cadastro:home' %}" class="btn btn-secondary btn-sm">← Início</a>
+</div>
+
+<p style="color:var(--color-text-muted);font-weight:300;margin-bottom:1.75rem;max-width:60ch;">
+  Painéis de desempenho para acompanhamento das metas contratuais e da produção por prestador.
+</p>
+
+<div class="ind-hub-grid">
+
+  <a href="{% url 'cadastro:indicadores_prestador' %}" class="ind-card ind-card-amber">
+    <div class="ind-card-icon ind-card-icon-amber">📊</div>
+    <div>
+      <p class="ind-card-label">Dashboard</p>
+      <h2 class="ind-card-title">Metas por Prestador</h2>
+    </div>
+    <p class="ind-card-desc">
+      Série temporal da produção mensal comparada à meta contratualizada, por serviço.
+      Filtrável por razão social, especialidade e período.
+    </p>
+    <div class="ind-card-cta">
+      Abrir dashboard
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+  </a>
+
+  <a href="{% url 'cadastro:indicadores_especialidade' %}" class="ind-card ind-card-gold">
+    <div class="ind-card-icon ind-card-icon-gold">🩺</div>
+    <div>
+      <p class="ind-card-label">Dashboard</p>
+      <h2 class="ind-card-title">Produção por Especialidade</h2>
+    </div>
+    <p class="ind-card-desc">
+      Produção mensal agregada de todos os médicos de uma especialidade,
+      independente do prestador. Filtrável por médico e período.
+    </p>
+    <div class="ind-card-cta">
+      Abrir dashboard
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+  </a>
+
+  <div class="ind-card ind-card-blue ind-card-disabled">
+    <div class="ind-card-icon ind-card-icon-blue">🎯</div>
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+      <div>
+        <p class="ind-card-label">Dashboard</p>
+        <h2 class="ind-card-title">Metas Contratuais</h2>
+      </div>
+      <span class="ind-badge-wip">Em desenvolvimento</span>
+    </div>
+    <p class="ind-card-desc">
+      Visão consolidada das metas contratuais de todos os prestadores —
+      aderência global, ranking de cumprimento e alertas de desvio.
+    </p>
+    <div class="ind-card-cta" style="opacity:.5">Em breve</div>
+  </div>
+
+</div>
+{% endblock %}

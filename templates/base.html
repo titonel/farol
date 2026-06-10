@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Farol{% endblock %}</title>
     
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -36,14 +41,21 @@
                                 <i class="bi bi-house-door"></i> Início
                             </a>
                         </li>
+                        {% if user.pode_cadastrar_usuarios %}
                         <li class="nav-item">
-                            <a class="nav-link {% if '/cadastro' in request.path %}active{% endif %}" href="{% url 'cadastro_menu' %}">
-                                <i class="bi bi-person-plus"></i> Cadastro
+                            <a class="nav-link {% if '/usuarios/' in request.path %}active{% endif %}" href="{% url 'usuario_lista' %}">
+                                <i class="bi bi-people"></i> Usuários
                             </a>
                         </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link {% if '/producao' in request.path %}active{% endif %}" href="{% url 'producao_menu' %}">
                                 <i class="bi bi-bar-chart-line"></i> Produção
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/prestadores/' in request.path %}active{% endif %}" href="{% url 'cadastro:home' %}">
+                                <i class="bi bi-briefcase"></i> Contratos & Prestadores
                             </a>
                         </li>
                         {% if user.is_admin %}
@@ -77,7 +89,7 @@
         {% endif %}
         
         <!-- Conteúdo Principal -->
-        <div class="content-wrapper">
+        <div class="content-wrapper fade-in">
             <div class="container">
                 <!-- Mensagens do Sistema -->
                 {% if messages %}

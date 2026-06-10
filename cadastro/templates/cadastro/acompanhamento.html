@@ -1,0 +1,257 @@
+{% extends "cadastro/base.html" %}
+
+{% block title %}Acompanhamento de Produção — Cadastro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">📊 Acompanhamento de Produção</h1>
+  <a href="{% url 'cadastro:home' %}" class="btn btn-secondary btn-sm">← Voltar</a>
+</div>
+
+{# ── Mensagens de feedback ── #}
+{% if messages %}
+<ul class="messages">
+  {% for msg in messages %}
+  <li class="{{ msg.tags }}">{{ msg }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{# ════════════════════════════════════════════
+   ÁREA DE UPLOAD
+   ════════════════════════════════════════════ #}
+<div class="upload-grid">
+
+  {# — Card: Consultas — #}
+  <div class="upload-card">
+    <div class="upload-card-header">
+      <div class="icon icon-consulta">🩺</div>
+      <div>
+        <div class="title">Produção de Consultas</div>
+        <div class="subtitle">Relatório XLS de consultas ambulatoriais (SIRESP)</div>
+      </div>
+    </div>
+    <div class="upload-card-body">
+      <form method="post" enctype="multipart/form-data" id="form-consulta">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="consulta">
+
+        <div class="drop-zone" id="dz-consulta">
+          <input
+            type="file"
+            name="arquivo_producao"
+            accept=".xls,.xlsx"
+            id="file-consulta"
+            aria-label="Selecionar arquivo XLS de consultas"
+          >
+          <div class="drop-zone-icon">📂</div>
+          <div class="drop-zone-text">
+            <strong>Clique para selecionar</strong> ou arraste o arquivo aqui
+          </div>
+          <div class="drop-zone-hint">Formatos aceitos: .xls, .xlsx</div>
+        </div>
+
+        <div class="upload-submit">
+          <button type="submit" class="btn btn-primary">
+            ⬆ Importar Consultas
+          </button>
+          <span id="nome-consulta" style="font-size:.8125rem;color:var(--color-text-muted);"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# — Card: Cirurgias / Exames — #}
+  <div class="upload-card">
+    <div class="upload-card-header">
+      <div class="icon icon-cirurgia">🔬</div>
+      <div>
+        <div class="title">Produção de Cirurgias / Exames</div>
+        <div class="subtitle">Relatório XLS de cirurgias e exames (SIRESP)</div>
+      </div>
+    </div>
+    <div class="upload-card-body">
+      <form method="post" enctype="multipart/form-data" id="form-cirurgia">
+        {% csrf_token %}
+        <input type="hidden" name="tipo" value="cirurgia_exame">
+
+        <div class="drop-zone" id="dz-cirurgia">
+          <input
+            type="file"
+            name="arquivo_producao"
+            accept=".xls,.xlsx"
+            id="file-cirurgia"
+            aria-label="Selecionar arquivo XLS de cirurgias e exames"
+          >
+          <div class="drop-zone-icon">📂</div>
+          <div class="drop-zone-text">
+            <strong>Clique para selecionar</strong> ou arraste o arquivo aqui
+          </div>
+          <div class="drop-zone-hint">Formatos aceitos: .xls, .xlsx</div>
+        </div>
+
+        <div class="upload-submit">
+          <button type="submit" class="btn btn-warning">
+            ⬆ Importar Cirurgias/Exames
+          </button>
+          <span id="nome-cirurgia" style="font-size:.8125rem;color:var(--color-text-muted);"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>{# /upload-grid #}
+
+{# ════════════════════════════════════════════
+   HISTÓRICO DE IMPORTAÇÕES
+   ════════════════════════════════════════════ #}
+<div class="card">
+  <div class="section-title">Histórico de Importações</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-target="tab-consultas">🩺 Consultas</button>
+    <button class="tab-btn" data-target="tab-cirurgias">🔬 Cirurgias / Exames</button>
+  </div>
+
+  {# Tab: Consultas #}
+  <div class="tab-panel active" id="tab-consultas">
+    {% if uploads_consulta %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Arquivo</th>
+            <th>Período</th>
+            <th>Agendas</th>
+            <th>Médicos</th>
+            <th>Enviado em</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for up in uploads_consulta %}
+          <tr>
+            <td>{{ up.nome_arquivo }}</td>
+            <td>{{ up.periodo_display }}</td>
+            <td style="text-align:center;">{{ up.total_agendas }}</td>
+            <td style="text-align:center;">{{ up.total_medicos }}</td>
+            <td>{{ up.enviado_em|date:"d/m/Y H:i" }}</td>
+            <td>
+              <span class="badge status-{{ up.status }}">
+                {{ up.get_status_display }}
+              </span>
+              {% if up.erro_processamento %}
+              <div style="font-size:.75rem;color:#a12c7b;margin-top:.25rem;">
+                {{ up.erro_processamento|truncatechars:80 }}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      Nenhum arquivo de consultas importado ainda.
+    </div>
+    {% endif %}
+  </div>
+
+  {# Tab: Cirurgias/Exames #}
+  <div class="tab-panel" id="tab-cirurgias">
+    {% if uploads_cirurgia %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Arquivo</th>
+            <th>Período</th>
+            <th>Agendas</th>
+            <th>Médicos</th>
+            <th>Enviado em</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for up in uploads_cirurgia %}
+          <tr>
+            <td>{{ up.nome_arquivo }}</td>
+            <td>{{ up.periodo_display }}</td>
+            <td style="text-align:center;">{{ up.total_agendas }}</td>
+            <td style="text-align:center;">{{ up.total_medicos }}</td>
+            <td>{{ up.enviado_em|date:"d/m/Y H:i" }}</td>
+            <td>
+              <span class="badge status-{{ up.status }}">
+                {{ up.get_status_display }}
+              </span>
+              {% if up.erro_processamento %}
+              <div style="font-size:.75rem;color:#a12c7b;margin-top:.25rem;">
+                {{ up.erro_processamento|truncatechars:80 }}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      Nenhum arquivo de cirurgias/exames importado ainda.
+    </div>
+    {% endif %}
+  </div>
+
+</div>{# /card histórico #}
+
+<script>
+/* ── Drop zone feedback ── */
+function initDropZone(dzId, fileId, labelId) {
+  const dz = document.getElementById(dzId);
+  const input = document.getElementById(fileId);
+  const label = document.getElementById(labelId);
+  if (!dz || !input) return;
+
+  input.addEventListener('change', () => {
+    const name = input.files[0] ? input.files[0].name : '';
+    if (name) {
+      dz.classList.add('has-file');
+      dz.querySelector('.drop-zone-text').innerHTML =
+        `<strong>✔ Arquivo selecionado:</strong> ${name}`;
+      if (label) label.textContent = '';
+    }
+  });
+
+  ['dragover', 'dragenter'].forEach(ev => {
+    dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    dz.addEventListener(ev, () => dz.classList.remove('dragover'));
+  });
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+}
+
+initDropZone('dz-consulta',  'file-consulta',  'nome-consulta');
+initDropZone('dz-cirurgia',  'file-cirurgia',  'nome-cirurgia');
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+</script>
+{% endblock %}

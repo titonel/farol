@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Estilo Customizado do Módulo de Cadastro -->
+<link rel="stylesheet" href="{% static 'cadastro/estilo-ambar.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'cadastro/mascaras.js' %}"></script>
+{% endblock %}

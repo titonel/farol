@@ -5,112 +5,73 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h2><i class="bi bi-gear"></i> Configurações do Sistema</h2>
-        <p class="text-muted">Gestão de dados estratégicos da unidade - Acesso exclusivo Tier 5</p>
+        <h2 class="fw-bold text-dark"><i class="bi bi-gear-fill text-secondary me-2"></i> Configurações do Sistema</h2>
+        <p class="text-muted">Gestão de dados estratégicos da unidade — Acesso exclusivo Tier 5</p>
     </div>
 </div>
 
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> <strong>Atenção:</strong> Esta área contém informações sensíveis e estratégicas. Apenas administradores (Tier 5) têm acesso.
+    <i class="bi bi-info-circle-fill"></i>
+    <span><strong>Atenção:</strong> Esta área contém informações sensíveis e estratégicas. Apenas administradores (Tier 5) têm acesso.</span>
 </div>
 
-<div class="row">
+<div class="menu-grid mb-4">
     {# Cirurgias #}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm hover-card">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="bi bi-scissors" style="font-size: 3rem; color: var(--primary-color);"></i>
-                </div>
-                <h5 class="card-title">Cirurgias</h5>
-                <p class="text-muted">Gestão de procedimentos cirúrgicos</p>
-                <div class="mb-3">
-                    <span class="badge bg-primary">{{ total_cirurgias }} cadastrada(s)</span>
-                </div>
-                <a href="{% url 'cirurgia_lista' %}" class="btn btn-primary w-100">
-                    <i class="bi bi-list-ul"></i> Gerenciar Cirurgias
-                </a>
-            </div>
+    <a href="{% url 'cirurgia_lista' %}" class="menu-card-item">
+        <div class="icon">
+            <i class="bi bi-scissors text-primary"></i>
         </div>
-    </div>
+        <h4>Cirurgias</h4>
+        <p>Gestão de procedimentos cirúrgicos.</p>
+        <span class="badge bg-primary mt-2">{{ total_cirurgias }} cadastrada(s)</span>
+    </a>
     
     {# Exames #}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm hover-card">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="bi bi-clipboard2-pulse" style="font-size: 3rem; color: var(--secondary-color);"></i>
-                </div>
-                <h5 class="card-title">Exames</h5>
-                <p class="text-muted">Gestão de exames médicos</p>
-                <div class="mb-3">
-                    <span class="badge bg-secondary">{{ total_exames }} cadastrado(s)</span>
-                </div>
-                <a href="{% url 'exame_lista' %}" class="btn btn-secondary w-100">
-                    <i class="bi bi-list-ul"></i> Gerenciar Exames
-                </a>
-            </div>
+    <a href="{% url 'exame_lista' %}" class="menu-card-item">
+        <div class="icon">
+            <i class="bi bi-clipboard2-pulse-fill text-info"></i>
         </div>
-    </div>
+        <h4>Exames</h4>
+        <p>Gestão de exames médicos.</p>
+        <span class="badge bg-info mt-2">{{ total_exames }} cadastrado(s)</span>
+    </a>
     
     {# Serviços Médicos #}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm hover-card">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="bi bi-hospital" style="font-size: 3rem; color: var(--success-color);"></i>
-                </div>
-                <h5 class="card-title">Serviços Médicos</h5>
-                <p class="text-muted">Gestão de serviços oferecidos</p>
-                <div class="mb-3">
-                    <span class="badge bg-success">{{ total_servicos }} cadastrado(s)</span>
-                </div>
-                <a href="{% url 'servico_lista' %}" class="btn btn-success w-100">
-                    <i class="bi bi-list-ul"></i> Gerenciar Serviços
-                </a>
-            </div>
+    <a href="{% url 'servico_lista' %}" class="menu-card-item">
+        <div class="icon">
+            <i class="bi bi-hospital-fill text-success"></i>
         </div>
-    </div>
+        <h4>Serviços Médicos</h4>
+        <p>Gestão de serviços oferecidos.</p>
+        <span class="badge bg-success mt-2">{{ total_servicos }} cadastrado(s)</span>
+    </a>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Sobre os Dados Estratégicos</h5>
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 text-dark fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i> Sobre os Dados Estratégicos</h6>
     </div>
     <div class="card-body">
-        <div class="row">
+        <div class="row g-3">
             <div class="col-md-4">
-                <h6><i class="bi bi-scissors"></i> Cirurgias</h6>
-                <p class="small text-muted">Cadastro de procedimentos cirúrgicos com códigos SIGTAP, valores, tipos e especialidades. Suporta importação em massa via CSV.</p>
+                <h6 class="fw-bold text-dark"><i class="bi bi-scissors text-primary me-2"></i> Cirurgias</h6>
+                <p class="small text-muted mb-0">Cadastro de procedimentos cirúrgicos com códigos SIGTAP, valores, tipos e especialidades. Suporta importação em massa via CSV.</p>
             </div>
             <div class="col-md-4">
-                <h6><i class="bi bi-clipboard2-pulse"></i> Exames</h6>
-                <p class="small text-muted">Gestão de exames médicos incluindo laboratoriais, imagens, funcionais e patologia com orientações de preparo.</p>
+                <h6 class="fw-bold text-dark"><i class="bi bi-clipboard2-pulse-fill text-info me-2"></i> Exames</h6>
+                <p class="small text-muted mb-0">Gestão de exames médicos incluindo laboratoriais, imagens, funcionais e patologia com orientações de preparo.</p>
             </div>
             <div class="col-md-4">
-                <h6><i class="bi bi-hospital"></i> Serviços Médicos</h6>
-                <p class="small text-muted">Cadastro de serviços oferecidos pela unidade com informações de duração e especialidades responsáveis.</p>
+                <h6 class="fw-bold text-dark"><i class="bi bi-hospital-fill text-success me-2"></i> Serviços Médicos</h6>
+                <p class="small text-muted mb-0">Cadastro de serviços oferecidos pela unidade com informações de duração e especialidades responsáveis.</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="mt-3">
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+<div class="mt-4">
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary shadow-sm">
         <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
     </a>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.hover-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-</style>
 {% endblock %}

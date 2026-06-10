@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Contratos & Prestadores - Farol{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark"><i class="bi bi-briefcase-fill text-primary me-2"></i> Contratos & Prestadores</h2>
+            <p class="text-muted mb-0">Gestão integrada de prestadores de serviços médicos, vigências contratuais e relatórios do SIRESP</p>
+        </div>
+        <a href="{% url 'cadastro:contrato_upload' %}" class="btn btn-primary shadow-sm">
+            <i class="bi bi-file-earmark-pdf-fill"></i> Importar Novo Contrato
+        </a>
+    </div>
+</div>
+
+<!-- Grid de Indicadores Rápidos -->
+<div class="dashboard-grid mb-4">
+    <!-- Card Prestadores -->
+    <a href="{% url 'cadastro:prestador_list' %}" class="dashboard-card-modern blue">
+        <div class="card-icon-wrapper">
+            <i class="bi bi-building-fill-check"></i>
+        </div>
+        <div class="card-info">
+            <h3>{{ total_prestadores|default:"0" }}</h3>
+            <p>Prestadores Ativos</p>
+        </div>
+    </a>
+
+    <!-- Card Especialidades -->
+    <div class="dashboard-card-modern emerald">
+        <div class="card-icon-wrapper">
+            <i class="bi bi-heart-pulse-fill"></i>
+        </div>
+        <div class="card-info">
+            <h3>{{ total_especialidades|default:"0" }}</h3>
+            <p>Especialidades Ativas</p>
+        </div>
+    </div>
+
+    <!-- Card Contratos -->
+    <a href="{% url 'cadastro:contrato_upload' %}" class="dashboard-card-modern cyan">
+        <div class="card-icon-wrapper">
+            <i class="bi bi-file-earmark-text-fill"></i>
+        </div>
+        <div class="card-info">
+            <h3>{{ total_contratos|default:"0" }}</h3>
+            <p>Contratos PDF Processados</p>
+        </div>
+    </a>
+</div>
+
+<!-- Grade de Módulos Operacionais -->
+<div class="row g-3">
+    <!-- Módulo 1: Acompanhamento de Produção -->
+    <div class="col-md-6 col-lg-3">
+        <div class="border rounded-3 p-3 h-100 d-flex flex-column justify-content-between bg-white shadow-sm">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-4 text-primary me-2"><i class="bi bi-bar-chart-line-fill"></i></span>
+                    <h6 class="fw-bold text-dark mb-0">Acompanhamento</h6>
+                </div>
+                <p class="text-muted small">Importação e registro estruturado da produtividade mensal de agendas e médicos extraída do portal SIRESP.</p>
+            </div>
+            <a href="{% url 'cadastro:acompanhamento' %}" class="btn btn-primary btn-sm w-100 mt-3">
+                Registrar Produção <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Módulo 2: Relatório de Apuração -->
+    <div class="col-md-6 col-lg-3">
+        <div class="border rounded-3 p-3 h-100 d-flex flex-column justify-content-between bg-white shadow-sm">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-4 text-success me-2"><i class="bi bi-file-earmark-excel-fill"></i></span>
+                    <h6 class="fw-bold text-dark mb-0">Relatórios XLSX</h6>
+                </div>
+                <p class="text-muted small">Geração automatizada de faturas e demonstrativos contratuais para prestação de contas (ciclo de 21 a 20).</p>
+            </div>
+            <a href="{% url 'cadastro:relatorio' %}" class="btn btn-success btn-sm w-100 mt-3">
+                Emitir Relatórios <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Módulo 3: Prestadores & Contratos -->
+    <div class="col-md-6 col-lg-3">
+        <div class="border rounded-3 p-3 h-100 d-flex flex-column justify-content-between bg-white shadow-sm">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-4 text-info me-2"><i class="bi bi-people-fill"></i></span>
+                    <h6 class="fw-bold text-dark mb-0">Prestadores</h6>
+                </div>
+                <p class="text-muted small">Visualização de cadastro completo de prestadores médicos, tabela de valores e vigência contratual.</p>
+            </div>
+            <a href="{% url 'cadastro:prestador_list' %}" class="btn btn-info text-white btn-sm w-100 mt-3">
+                Ver Prestadores <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Módulo 4: Médicos Credenciados -->
+    <div class="col-md-6 col-lg-3">
+        <div class="border rounded-3 p-3 h-100 d-flex flex-column justify-content-between bg-white shadow-sm">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-4 text-danger me-2"><i class="bi bi-heart-pulse-fill"></i></span>
+                    <h6 class="fw-bold text-dark mb-0">Médicos</h6>
+                </div>
+                <p class="text-muted small">Gestão do corpo clínico credenciado à unidade e suas especialidades de atendimento cadastradas.</p>
+            </div>
+            <a href="{% url 'cadastro:medico_list' %}" class="btn btn-danger btn-sm w-100 mt-3">
+                Ver Médicos <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left"></i> Voltar ao Dashboard Geral
+        </a>
+    </div>
+</div>
+{% endblock %}

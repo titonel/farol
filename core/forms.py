@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
-from .models import Usuario, Empresa, Medico, Cirurgia, Exame, ServicoMedico
+from .models import Usuario, Cirurgia, Exame, ServicoMedico
 import csv
 import io
 
@@ -105,89 +105,6 @@ class UsuarioForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
-
-
-class EmpresaForm(forms.ModelForm):
-    """Formulário para cadastro de empresas."""
-    
-    class Meta:
-        model = Empresa
-        fields = [
-            'razao_social', 'nome_fantasia', 'cnpj',
-            'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado',
-            'telefone', 'email', 'ativa'
-        ]
-        widgets = {
-            'razao_social': forms.TextInput(attrs={'class': 'form-control'}),
-            'nome_fantasia': forms.TextInput(attrs={'class': 'form-control'}),
-            'cnpj': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '00.000.000/0000-00'
-            }),
-            'cep': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '00000-000',
-                'id': 'cep_field'
-            }),
-            'logradouro': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'logradouro_field',
-                'placeholder': 'Rua, Avenida, etc.'
-            }),
-            'numero': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'numero_field',
-                'placeholder': 'Número'
-            }),
-            'complemento': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'complemento_field',
-                'placeholder': 'Apto, Sala, Bloco, etc.'
-            }),
-            'bairro': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'bairro_field',
-                'placeholder': 'Bairro'
-            }),
-            'cidade': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'cidade_field',
-                'placeholder': 'Cidade'
-            }),
-            'estado': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'estado_field',
-                'placeholder': 'UF (ex: SP)',
-                'maxlength': '2',
-                'style': 'text-transform: uppercase;'
-            }),
-            'telefone': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'ativa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-
-class MedicoForm(forms.ModelForm):
-    """Formulário para cadastro de médicos."""
-    
-    class Meta:
-        model = Medico
-        fields = ['nome_completo', 'crm', 'cpf', 'especialidade', 'telefone', 'email', 'ativo']
-        widgets = {
-            'nome_completo': forms.TextInput(attrs={'class': 'form-control'}),
-            'crm': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ex: CRM/SP 123456'
-            }),
-            'cpf': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '000.000.000-00'
-            }),
-            'especialidade': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefone': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
 
 
 # ===== FORMULÁRIOS DA ÁREA ADMINISTRATIVA =====

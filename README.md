@@ -1,202 +1,126 @@
-# Farol
+# Farol — Sistema de Gestão Integrada (AME Caraguatatuba)
 
-Sistema de controle corporativo com autenticação e controle de acesso baseado em funções (RBAC).
+Sistema corporativo unificado para o **AME Caraguatatuba** (SECONCI-SP / SUS-OSS), integrando o controle de acesso baseado em funções (RBAC), acompanhamento gráfico de produção, gestão de prestadores/contratos e extração automatizada de dados de PDFs.
 
-## Características
+O projeto atual unifica o sistema **Farol** original com o módulo de gestão de contratos e prestadores (`cadastro`).
 
-- Sistema de login com troca obrigatória de senha no primeiro acesso
-- Controle de acesso baseado em 5 níveis (Tiers)
-- Cadastro de usuários, empresas e médicos
-- Interface responsiva e corporativa
-- Desenvolvido em Django/Python
+---
 
-## Instalação Rápida
+## 🚀 Funcionalidades e Módulos
 
-### Opção 1: Setup Automático (Recomendado)
+### 1. Núcleo Farol (Módulo Geral)
+* **Autenticação Segura**: Login corporativo com troca obrigatória de senha no primeiro acesso.
+* **Controle de Acesso (RBAC)**: Estrutura em 5 níveis (Tiers) para controle de permissões.
+* **Cadastros Administrativos**: Cadastro de Usuários (Tier 3+) do sistema.
+* **Dashboard Executivo**: Visão geral com métricas rápidas de cadastros, atalhos dinâmicos e controle integrado de contratos.
 
+### 2. Módulo de Produção Mensal (Consolidado)
+* **Importação via Planilha**: Upload de planilhas de produção de exames, cirurgias e serviços.
+* **Interface Gráfica Interativa (Chart.js)**:
+  * Gráfico de Ocupação comparando vagas ofertadas versus agendamentos realizados.
+  * Gráfico horizontal de alerta de desperdício por especialidade (destacando taxas superiores a 15%).
+  * KPIs calculados dinamicamente no navegador (Vagas, Agendamentos e Eficiência Global).
+
+### 3. Módulo de Contratos & Prestadores
+* **Importação e Leitura do SIRESP**:
+  * Identificação automática de relatórios de Consultas e Exames/Cirurgias (HTML ou XLS).
+  * Parser estruturado (`producao_siresp.py` e `producao_siresp_exames.py`) que processa agendas conhecidas e dados individuais por profissional.
+* **Leitor Automático de Contratos PDF**:
+  * Extração de dados cadastrais (CNPJ, Razão Social, endereço, representantes, vigências e valores mensais/globais) de PDFs no padrão SECONCI-SP utilizando `pdfplumber` e `PyMuPDF`.
+  * Visualização estruturada para revisão e confirmação antes de gravar no banco de dados.
+* **Relatório de Prestação de Contas**:
+  * Emissão automática de planilha XLSX formatada por período (ciclo de apuração de 21 a 20).
+* **Segurança Integrada**:
+  * Todas as rotas do módulo de Contratos & Prestadores (`/prestadores/...`) são protegidas pelo decorator de autenticação e política de primeiro acesso do Farol.
+
+---
+
+## 🎨 Identidade Visual e Experiência do Usuário (UI/UX)
+
+* **Tema Farol**: Interface limpa e moderna utilizando a fonte **Inter** do Google Fonts, com paleta corporativa premium baseada em *Slate* (Slate-900 `#0f172a`, Slate-800 `#1e293b`), destaques em azul cobalto, sombras suaves, cantos arredondados (`12px`) e animações suaves (`fade-in`) nas transições de página.
+* **Tema de Contratos**: Seção de contratos mantém a identidade visual quente ("Dia Ensolarado") baseada na paleta bronze/âmbar (`#FFBF00` e `#807040`) e fonte **Lato**, integrada à navegação global do sistema.
+
+---
+
+## 📂 Estrutura do Projeto Unificado
+
+```
+farol-project/
+├── farol/                     # Configurações globais do projeto Django
+├── core/                      # App principal (Autenticação, Usuários e Produção)
+│   ├── models.py              # Modelos (Usuario, Cirurgia, Exame, etc.)
+│   ├── views.py               # Lógica das views e dashboards
+│   ├── forms.py               # Formulários
+│   └── urls.py                # Rotas do Farol
+├── cadastro/                  # App de Contratos (Prestadores, Contratos e Leitor PDF)
+│   ├── models.py              # Modelos (Prestador, ContratoUpload, UploadProducao, etc.)
+│   ├── views.py               # Lógica de Prestadores e PDF
+│   ├── views_home.py          # Lógica de relatórios e SIRESP
+│   ├── extrator.py            # Mapeador de dados PDF
+│   ├── producao_siresp.py     # Parser de consultas
+│   ├── producao_siresp_exames.py # Parser de cirurgias/exames
+│   └── urls.py                # Rotas do módulo de Contratos
+├── static/                    # Arquivos estáticos globais (CSS redesenhado, imagens)
+├── templates/                 # Templates HTML globais do Farol
+├── media/                     # Diretório de arquivos de contratos e planilhas enviadas
+├── manage.py                  # Script de gerenciamento do Django
+└── requirements.txt           # Dependências do sistema unificado
+```
+
+---
+
+## 🛠️ Instalação e Configuração
+
+### 1. Clonar o Repositório e Configurar Ambiente
 ```bash
 git clone https://github.com/titonel/farol.git
 cd farol
 python -m venv .venv
 
-# No Windows:
-.venv\Scripts\activate
+# No Windows (PowerShell):
+.venv\Scripts\Activate.ps1
 
 # No Linux/Mac:
 source .venv/bin/activate
-
-# Execute o setup automático:
-python setup.py
 ```
 
-### Opção 2: Instalação Manual
-
-1. **Clone o repositório:**
-```bash
-git clone https://github.com/titonel/farol.git
-cd farol
-```
-
-2. **Crie e ative o ambiente virtual:**
-
-**No Windows:**
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-**No Linux/Mac:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-3. **Instale as dependências:**
+### 2. Instalar Dependências
 ```bash
 pip install -r requirements.txt
 ```
+> **Nota:** Certifique-se de que dependências de processamento como `pandas`, `pdfplumber`, `PyMuPDF`, `lxml` e `cryptography` foram instaladas corretamente no ambiente virtual.
 
-4. **⚠️ IMPORTANTE: Execute as migrações do banco de dados:**
+### 3. Rodar as Migrações do Banco de Dados
 ```bash
 python manage.py migrate
 ```
+As migrações criarão as tabelas tanto do Farol (`core`) quanto do módulo de Contratos (`cadastro`) no mesmo banco de dados SQLite.
 
-> **Nota:** Este passo é essencial! Se você pular esta etapa, receberá o erro: `django.db.utils.OperationalError: no such table: core_usuario`
-
-5. **Crie um superusuário (administrador):**
+### 4. Criar Superusuário (Administrador Tier 5)
 ```bash
 python manage.py createsuperuser
 ```
+Preencha o Nome, E-mail, DRT/Matrícula e Senha solicitados.
 
-O sistema irá solicitar:
-- Username
-- E-mail
-- Nome completo
-- Password (2x)
-
-6. **Inicie o servidor:**
+### 5. Iniciar o Servidor
 ```bash
 python manage.py runserver
 ```
 
-7. **Acesse o sistema:**
-- Sistema: http://127.0.0.1:8000
-- Admin: http://127.0.0.1:8000/admin
+Acesse o sistema em: **http://127.0.0.1:8000/**
 
-## Resolução de Problemas
+---
 
-### Erro: "no such table: core_usuario"
+## 🔑 Níveis de Acesso (RBAC)
 
-**Este erro ocorre quando as migrações não foram executadas.**
+* **Tier 1**: Usuário Operacional (Visualização básica de dados).
+* **Tier 2**: Analista / Líder de Setor.
+* **Tier 3**: Supervisor (Permissão para cadastrar novos usuários).
+* **Tier 4**: Coordenador.
+* **Tier 5**: Gerente / Administrador do Sistema (Acesso ao painel administrativo e tabelas SIGTAP).
 
-**Solução:**
-```bash
-python manage.py migrate
-```
+---
 
-Você deve ver uma saída como:
-```
-Running migrations:
-  Applying contenttypes.0001_initial... OK
-  Applying auth.0001_initial... OK
-  Applying core.0001_initial... OK
-  ...
-```
+## 📄 Licença
 
-Após isso, execute novamente:
-```bash
-python manage.py createsuperuser
-```
-
-### Erro: "ModuleNotFoundError: No module named 'decouple'"
-
-**Solução:**
-```bash
-pip install -r requirements.txt
-```
-
-### Resetar o Banco de Dados
-
-Se precisar recomeçar do zero:
-
-**Windows:**
-```bash
-del db.sqlite3
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-**Linux/Mac:**
-```bash
-rm db.sqlite3
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-## Estrutura do Projeto
-
-```
-farol/
-├── farol/                # Configurações do projeto
-├── core/                  # Aplicação principal
-│   ├── models.py         # Modelos (Usuario, Empresa, Medico)
-│   ├── views.py          # Lógica das views
-│   ├── forms.py          # Formulários
-│   ├── urls.py           # Rotas
-│   └── migrations/       # Migrações do banco
-├── templates/            # Templates HTML
-├── static/               # Arquivos estáticos
-│   └── estilo.css        # CSS único do sistema
-├── manage.py             # Script de gerenciamento
-├── requirements.txt      # Dependências
-└── setup.py              # Script de setup automático
-```
-
-## Níveis de Acesso (RBAC)
-
-- **Tier 1**: Usuários operacionais (inserção de dados)
-- **Tier 2**: Analistas e líderes de setor
-- **Tier 3**: Supervisores (podem cadastrar usuários)
-- **Tier 4**: Coordenadores
-- **Tier 5**: Gerentes e administradores do sistema
-
-## Funcionalidades
-
-### Autenticação
-- Login com username e senha
-- Troca obrigatória de senha no primeiro acesso
-- Senhas criptografadas com segurança
-- Logout seguro
-
-### Cadastros
-
-**Usuários** (Tier 3+):
-- Nome completo, e-mail, CPF, DRT
-- Nível de acesso (Tier)
-- Username gerado automaticamente do e-mail
-
-**Empresas** (Todos):
-- Razão social, nome fantasia, CNPJ
-- Endereço, telefone, e-mail
-- Status ativo/inativo
-
-**Médicos** (Todos):
-- Nome completo, CRM, CPF
-- Especialidade, telefone, e-mail
-- Status ativo/inativo
-
-## Documentação Adicional
-
-Para mais detalhes, consulte:
-- [INSTALACAO.md](INSTALACAO.md) - Guia completo de instalação
-
-## Tecnologias Utilizadas
-
-- **Backend**: Python 3.8+, Django 4.2
-- **Frontend**: Bootstrap 5, Bootstrap Icons
-- **Banco de Dados**: SQLite (padrão) / PostgreSQL (opcional)
-- **Autenticação**: Sistema Django Auth customizado
-
-## Licença
-
-(c)2026, AME Caraguatatuba. Todos os direitos reservados.
+&copy; 2026, AME Caraguatatuba. Todos os direitos reservados.
