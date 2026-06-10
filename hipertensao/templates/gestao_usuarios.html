@@ -1,0 +1,230 @@
+{% extends 'sidebar.html' %}
+{% load static %}
+
+{% block subcontent %}
+<div class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary fw-bold"><i class="fas fa-user-md me-2"></i>Gestão de Equipe</h2>
+            <p class="text-muted">Gerencie médicos, enfermeiros e equipe administrativa.</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-lg shadow-sm" onclick="abrirModalNovo()">
+            <i class="fas fa-plus me-2"></i>Novo Usuário
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Profissional</th>
+                        <th>Cargo/Função</th>
+                        <th>Registro (Conselho/DRT)</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">{{ u.get_full_name|default:u.username }}</div>
+                            <div class="small text-muted">{{ u.email }}</div>
+                        </td>
+                        <td>
+                            {% if u.tipo_profissional == 'MED' %}<span class="badge bg-primary">Médico</span>
+                            {% elif u.tipo_profissional == 'ENF' %}<span class="badge bg-success">Enfermeiro</span>
+                            {% elif u.tipo_profissional == 'NUT' %}<span class="badge bg-warning text-dark">Nutricionista</span>
+                            {% elif u.tipo_profissional == 'FAR' %}<span class="badge bg-info text-dark">Farmacêutico</span>
+                            {% else %}<span class="badge bg-secondary">Administrativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.tipo_registro and u.registro_profissional %}
+                                <strong>{{ u.tipo_registro }}:</strong> {{ u.registro_profissional }}
+                            {% endif %}
+                            {% if u.drt %}
+                                <div class="small text-muted">Matr: {{ u.drt }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i> Ativo</span>
+                            {% else %}
+                                <span class="text-danger"><i class="fas fa-times-circle"></i> Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editarUsuario({{ u.id }})" title="Editar">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Nenhum usuário cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="usuario_id" id="usuario_id">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTitulo"><i class="fas fa-user-plus me-2"></i>Cadastrar Novo Profissional</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">1. Dados de Acesso e Pessoais</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Primeiro Nome</label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sobrenome</label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nome de Usuário (Login)</label>
+                            <input type="text" name="username" id="username" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary border-bottom pb-2 mb-3">2. Dados Profissionais</h6>
+                    <div class="row g-3 mb-4 bg-light p-3 rounded">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tipo de Profissional</label>
+                            <select name="tipo_profissional" id="tipo_profissional" class="form-select">
+                                <option value="">Administrativo / Outro</option>
+                                <option value="MED">Médico</option>
+                                <option value="ENF">Enfermeiro</option>
+                                <option value="NUT">Nutricionista</option>
+                                <option value="FAR">Farmacêutico</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Matrícula / DRT</label>
+                            <input type="text" name="drt" id="drt" class="form-control" placeholder="Opcional">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Sigla do Conselho</label>
+                            <select name="tipo_registro" id="tipo_registro" class="form-select">
+                                <option value="">---</option>
+                                <option value="CRM">CRM (Medicina)</option>
+                                <option value="COREN">COREN (Enfermagem)</option>
+                                <option value="CRN">CRN (Nutrição)</option>
+                                <option value="CRF">CRF (Farmácia)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Número do Registro</label>
+                            <input type="text" name="registro_profissional" id="registro_profissional" class="form-control" placeholder="Ex: 123456/SP">
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary border-bottom pb-2 mb-3">3. Segurança</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Preencha apenas para alterar">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center mt-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="mudar_senha" id="mudar_senha">
+                                <label class="form-check-label" for="mudar_senha">Forçar troca de senha no login</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
+                                <label class="form-check-label text-success fw-bold" for="is_active">Usuário Ativo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Salvar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Aguarda o carregamento completo do DOM e das bibliotecas (Bootstrap)
+    document.addEventListener('DOMContentLoaded', function() {
+        var modalElement = document.getElementById('modalUsuario');
+        var modalUsuario = new bootstrap.Modal(modalElement);
+
+        // Torna as funções globais para o onclick funcionar
+        window.abrirModalNovo = function() {
+            document.getElementById('modalTitulo').innerText = "Cadastrar Novo Profissional";
+            document.querySelector('form').reset();
+            document.getElementById('usuario_id').value = "";
+            document.getElementById('is_active').checked = true;
+            document.getElementById('mudar_senha').checked = true;
+            modalUsuario.show();
+        };
+
+        window.editarUsuario = function(id) {
+            // Busca dados na API
+            fetch(`/api/usuario/${id}/`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro na rede');
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('modalTitulo').innerText = "Editar Profissional";
+
+                    document.getElementById('usuario_id').value = data.id;
+                    document.getElementById('first_name').value = data.first_name || "";
+                    document.getElementById('last_name').value = data.last_name || "";
+                    document.getElementById('email').value = data.email || "";
+                    document.getElementById('username').value = data.username || "";
+
+                    document.getElementById('tipo_profissional').value = data.tipo_profissional || "";
+                    document.getElementById('drt').value = data.drt || "";
+                    document.getElementById('tipo_registro').value = data.tipo_registro || "";
+                    document.getElementById('registro_profissional').value = data.registro_profissional || "";
+
+                    document.getElementById('is_active').checked = data.is_active;
+                    document.getElementById('mudar_senha').checked = data.mudar_senha;
+
+                    document.getElementById('password').value = ""; // Senha vazia
+
+                    modalUsuario.show();
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert("Erro ao carregar dados do usuário. Tente recarregar a página.");
+                });
+        };
+    });
+</script>
+{% endblock subcontent %}

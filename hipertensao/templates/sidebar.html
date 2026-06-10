@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Linha de Cuidado - Hipertensão{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hipertensao-sidebar {
+        background: #1e293b; /* Slate-800 matching Farol */
+        border-radius: 12px;
+        padding: 1.25rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        border: 1px solid #334155;
+    }
+    .hipertensao-sidebar ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .hipertensao-sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: #94a3b8; /* Slate-400 */
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    .hipertensao-sidebar a:hover {
+        color: #f8fafc; /* Slate-50 */
+        background: #334155; /* Slate-700 */
+    }
+    .hipertensao-sidebar a.active {
+        color: #ffffff;
+        background: #2563eb; /* Cobalt Blue matching Farol */
+    }
+    .hipertensao-content {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+    .page-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .page-title {
+        font-weight: 700;
+        color: #0f172a; /* Slate-900 */
+        margin: 0;
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Sidebar -->
+    <div class="col-lg-3">
+        <nav class="hipertensao-sidebar">
+            <ul>
+                <li>
+                    <a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                        <i class="bi bi-house-door"></i> Início
+                    </a>
+                </li>
+
+                {% if user.is_superuser or user.tipo_profissional == 'ENF' or user.tipo_profissional == 'NUT' or user.tipo_profissional == 'FAR' or user.tipo_profissional == 'MED' %}
+                <li>
+                    <a href="{% url 'atendimento_opcoes' %}" class="{% if request.resolver_match.url_name == 'atendimento_opcoes' %}active{% endif %}">
+                        <i class="bi bi-clipboard2-pulse"></i> Atendimento
+                    </a>
+                </li>
+                {% endif %}
+
+                <li>
+                    <a href="{% url 'atendimento_hub' %}" class="{% if request.resolver_match.url_name == 'atendimento_hub' or request.resolver_match.url_name == 'hub_opcoes_atendimento' or request.resolver_match.url_name == 'atendimento_paciente' %}active{% endif %}">
+                        <i class="bi bi-journal-medical"></i> Prontuário Clínico
+                    </a>
+                </li>
+
+                {% if user.is_superuser or user.tipo_profissional == 'ENF' or user.tipo_profissional == 'NUT' or user.tipo_profissional == 'FAR' %}
+                <li>
+                    <a href="{% url 'monitoramento_lista' %}" class="{% if request.resolver_match.url_name == 'monitoramento_lista' or request.resolver_match.url_name == 'monitoramento_painel' %}active{% endif %}">
+                        <i class="bi bi-display"></i> Monitoramento
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_superuser %}
+                <li>
+                    <a href="{% url 'gestao_medicamentos' %}" class="{% if request.resolver_match.url_name == 'gestao_medicamentos' %}active{% endif %}">
+                        <i class="bi bi-capsule"></i> Farmácia / REMUME
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'indices' %}" class="{% if request.resolver_match.url_name == 'indices' or request.resolver_match.url_name == 'api_dashboard' or request.resolver_match.url_name == 'dashboard_clinico' %}active{% endif %}">
+                        <i class="bi bi-bar-chart"></i> Índices e Métricas
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin_pacientes' %}" class="{% if request.resolver_match.url_name == 'admin_pacientes' %}active{% endif %}">
+                        <i class="bi bi-shield-lock text-danger"></i> Gestão de Pacientes
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'gestao_usuarios' %}" class="{% if request.resolver_match.url_name == 'gestao_usuarios' %}active{% endif %}">
+                        <i class="bi bi-person-badge"></i> Equipe (Usuários)
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9">
+        <div class="hipertensao-content">
+            {% block subcontent %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

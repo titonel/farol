@@ -76,6 +76,40 @@ class Usuario(AbstractUser):
         help_text='Indica se o usuário precisa trocar a senha no próximo login'
     )
     
+    mudar_senha = models.BooleanField('Forçar Troca de Senha', default=False)
+    email_verificado = models.BooleanField('Email Verificado', default=False)
+    
+    tipo_profissional = models.CharField(
+        'Tipo Profissional',
+        max_length=3,
+        choices=[
+            ('MED', 'Médico'),
+            ('ENF', 'Enfermeiro'),
+            ('NUT', 'Nutricionista'),
+            ('FAR', 'Farmacêutico'),
+        ],
+        null=True,
+        blank=True
+    )
+    tipo_registro = models.CharField(
+        'Conselho (Ex: CRM)',
+        max_length=10,
+        choices=[
+            ('CRM', 'CRM'),
+            ('COREN', 'COREN'),
+            ('CRN', 'CRN'),
+            ('CRF', 'CRF'),
+        ],
+        null=True,
+        blank=True
+    )
+    registro_profissional = models.CharField(
+        'Número do Conselho',
+        max_length=20,
+        null=True,
+        blank=True
+    )
+    
     data_cadastro = models.DateTimeField('Data de Cadastro', auto_now_add=True)
     data_atualizacao = models.DateTimeField('Última Atualização', auto_now=True)
     
@@ -91,12 +125,25 @@ class Usuario(AbstractUser):
     
     def __str__(self):
         return f"{self.nome_completo} ({self.get_tier_display()})"
-    
+
     def save(self, *args, **kwargs):
         if not self.username and self.email:
             self.username = self.email.split('@')[0]
         super().save(*args, **kwargs)
-    
+
+    @property
+    def assinatura_completa(self):
+        """Retorna uma string formatada para assinatura em documentos/PDFs."""
+        nome = self.nome_completo or self.get_full_name() or self.username
+        detalhes = []
+        if self.tipo_registro and self.registro_profissional:
+            detalhes.append(f"{self.tipo_registro}: {self.registro_profissional}")
+        if self.drt:
+            detalhes.append(f"Matrícula: {self.drt}")
+        if detalhes:
+            return f"{nome} | {' - '.join(detalhes)}"
+        return nome
+
     def pode_cadastrar_usuarios(self):
         """Verifica se o usuário tem permissão para cadastrar outros usuários."""
         return self.tier >= 3
